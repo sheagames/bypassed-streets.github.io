@@ -1,0 +1,285 @@
+<!DOCTYPE html><html lang="en-AU" class="boot-failed"><head>
+<meta charset="utf-8">
+<meta name="build" content="f6ecdba-mvrorgq8">
+<meta name="world" content="4e1d9560b17d6d3e">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brisbane Streets · Explore the city</title>
+<meta name="theme-color" content="#142c24">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Brisbane Streets">
+<meta name="format-detection" content="telephone=no">
+<!-- touch-primary device (the same test as src/device.js): set before the page paints, so the title screen shows the
+     touch help, not the keys -->
+<script>try{var q=/[?&]touch=([01])\b/.exec(location.search);if(q?q[1]==='1':matchMedia('(pointer: coarse)').matches&&navigator.maxTouchPoints>0)document.documentElement.classList.add('touch')}catch(e){}</script>
+<meta name="description" content="Explore Brisbane: ride a Lime, drive, take the bus and dodge the cops. Free in your browser on phone or PC.">
+<!-- Link previews (Open Graph: Facebook, Instagram, WhatsApp, Messenger, Discord, iMessage, LinkedIn; Twitter / X card).
+     og:url and the image URLs must be absolute: tools/build_release.mjs rewrites the origin for the site it builds for
+     (--site, default https://staging.brisbane-streets.pages.dev). The image is assets/ui/share_preview.jpg
+     (docs/launch/brand/share_preview_1200x630.jpg), a stable URL with no ?v= so link caches keep working. -->
+<link rel="canonical" href="https://brisbane-streets.pages.dev/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Brisbane Streets">
+<meta property="og:locale" content="en_AU">
+<meta property="og:title" content="Brisbane Streets">
+<meta property="og:description" content="Explore Brisbane: ride a Lime, drive, take the bus and dodge the cops. Free in your browser on phone or PC.">
+<meta property="og:url" content="https://brisbane-streets.pages.dev/">
+<meta property="og:image" content="images/share_preview.jpg">
+<meta property="og:image:secure_url" content="images/share_preview.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Brisbane Streets: a bin chicken in a footy jersey rides a green e-scooter past Brisbane City Hall, a police car close behind">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Brisbane Streets">
+<meta name="twitter:description" content="Explore Brisbane: ride a Lime, drive, take the bus and dodge the cops. Free in your browser on phone or PC.">
+<meta name="twitter:image" content="images/share_preview.jpg">
+<meta name="twitter:image:alt" content="Brisbane Streets: a bin chicken in a footy jersey rides a green e-scooter past Brisbane City Hall, a police car close behind">
+<link rel="icon" href="images/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="images/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+<link rel="manifest" href="js/manifest.json">
+<link rel="stylesheet" href="css/style.css">
+<!-- The boot supervisor (classic script, runs before any module): a load that cannot finish says so, with Reload, instead
+     of an endless loading screen. Catches a critical script / module that fails to download or never runs, no WebGL 2,
+     the renderer failing to start (src/main.js), an error in the load (src/main.js), the baked city's manifest failing
+     on a phone (src/stream/hook.js), and a load that stops making progress for 90 s (then it OFFERS Retry and keeps
+     loading: never an automatic reload). window.__boot: mark(name), fail(stage, err, {kind, title, text}), state().
+     Tested by tools/test_boot.mjs; the release build checks it is here (tools/build_release.mjs). -->
+<style id="boot-style">
+html.boot-failed #launch-loading,html.boot-failed #startBtn,html.boot-failed #launch-retry{display:none!important}
+#boot-msg{max-width:360px;margin:20px 0 8px;color:#f4f1df;font:15px/1.45 system-ui,"Segoe UI",sans-serif;text-shadow:0 1px 6px #000}
+#boot-msg b{display:block;font-size:20px;color:#cefa57;margin-bottom:4px}
+#boot-msg p{margin:0 0 12px;color:#eee8cf}
+#boot-msg button{display:inline-block;min-height:48px;padding:12px 26px;border:0;border-radius:10px;background:#cefa57;color:#142c24;font:700 17px system-ui,sans-serif;cursor:pointer}
+#boot-msg small{display:block;margin-top:10px;font-size:11px;color:#b5c2b2;word-break:break-word}
+#boot-msg.boot-float{position:fixed;left:50%;top:max(12px,env(safe-area-inset-top));transform:translateX(-50%);z-index:9999;width:min(420px,calc(100vw - 32px));margin:0;padding:14px 16px;background:#0c140ff2;border:1px solid #405847;border-radius:10px}
+</style>
+<script id="boot-supervisor">
+(function () {
+  var W = window, D = document, T0 = Date.now(), STALL_MS = +((/[?&]bootstall=(\d+)/.exec(location.search) || [])[1]) || 90000;   // (?bootstall=ms: tools/test_boot.mjs)
+  var meta = D.querySelector('meta[name="build"]'), BUILD = (meta && meta.getAttribute('content')) || 'dev';
+  var S = { build: BUILD, marks: {}, failed: null, slow: false, ready: false, lastProgress: T0, errors: [], resources: 0 };
+  function short(e) { var s = e && (e.message || e.reason || e) || ''; s = String(s).replace(/\s+/g, ' '); return s.length > 160 ? s.slice(0, 157) + '...' : s; }
+  function btn() { return D.getElementById('startBtn'); }
+  function stageNow() { var b = btn(); return (b && b.textContent || '').replace(/\s+/g, ' ').trim() || 'starting'; }
+  function whenDom(f) { if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', f); else f(); }
+  // the message: in the title screen's loading line where there is one, else a small box on top of the game
+  function show(title, text, detail, button, onClick) {
+    whenDom(function () {
+      var box = D.getElementById('boot-msg'), host = D.querySelector('#title:not(.hidden) .launch-action');
+      if (!box) { box = D.createElement('div'); box.id = 'boot-msg'; box.setAttribute('role', 'alert'); }
+      if (host) { box.className = ''; host.parentNode.insertBefore(box, host); } else { box.className = 'boot-float'; D.body.appendChild(box); }
+      box.innerHTML = '<b></b><p></p><button type="button"></button><small></small>';
+      box.children[0].textContent = title; box.children[1].textContent = text;
+      box.children[2].textContent = button; box.children[2].onclick = onClick;
+      box.children[3].textContent = detail;
+    });
+  }
+  function hide() { var b = D.getElementById('boot-msg'); if (b) b.parentNode.removeChild(b); }
+  function reload() { location.reload(); }
+  // (an in-app browser - Instagram, Facebook, TikTok...: its web view has less memory and an older engine than the phone's
+  //  own browser; the failure messages say where to open the game instead. src/inapp.js has the same detection.)
+  var UA = navigator.userAgent || '', IOS = /iPhone|iPad|iPod/.test(UA), BROWSER = IOS ? 'Safari' : /Android/.test(UA) ? 'Chrome' : 'Safari or Chrome';
+  var INAPP = /\bInstagram\b/.test(UA) ? 'Instagram' : /musical_ly|BytedanceWebview|TikTok/i.test(UA) ? 'TikTok' : /FBAN\/|FBAV\/|FB_IAB\/|FBIOS|\[FB/.test(UA) ? 'Facebook' : /\bSnapchat\b/.test(UA) ? 'Snapchat' : '';
+  var INAPP_HOW = IOS ? 'tap ••• then Open in browser' : 'tap ⋮ then Open in Chrome';
+  var TEXT = {
+    script: ["Brisbane couldn't load.", 'Part of the game did not download. Check your connection, then reload.'],
+    webgl: ["This browser can't run Brisbane Streets.", INAPP ? 'It needs WebGL 2 graphics, which ' + INAPP + "'s own browser does not offer here. Open this page in " + BROWSER + ' instead (' + INAPP_HOW + ').' : 'It needs WebGL 2 graphics, which are not available here. Try an up-to-date Chrome, Edge, Firefox or Safari, or turn on hardware acceleration.'],
+    renderer: ["The graphics couldn't start.", 'The browser would not create the 3D view. Close other tabs and apps, then reload.' + (INAPP ? ' Better still, open this page in ' + BROWSER + ' (' + INAPP_HOW + '): ' + INAPP + "'s own browser has less memory for games." : ' If it keeps happening, try ' + BROWSER + '.')],
+    oldbrowser: ['This browser is too old for Brisbane Streets.', INAPP ? 'Open this page in ' + BROWSER + ' instead (' + INAPP_HOW + '), or update the ' + INAPP + ' app and your phone.' : (/iPhone|iPad|iPod/.test(navigator.userAgent) ? 'Update your iPhone (Settings > General > Software Update) and open the game in Safari.' : 'Update your browser, or open the game in an up-to-date Chrome, Edge, Firefox or Safari.')],
+    city: ["Couldn't load the city", 'Check your connection, then try again.'],
+    load: ["Brisbane couldn't load.", 'Something went wrong while loading. Check your connection and reload. If it keeps happening, try another browser.']
+  };
+  /** a load that cannot finish: the message + Reload (first failure wins; never reloads by itself) */
+  S.fail = function (stage, err, o) {
+    o = o || {};
+    if (S.failed || S.ready) { if (!S.ready) S.errors.push(stage + ': ' + short(err)); return; }
+    var k = TEXT[o.kind] || TEXT.load;
+    S.failed = { stage: stage || stageNow(), kind: o.kind || 'load', error: short(err), at: Date.now() - T0 };
+    try { console.error('[boot] ' + S.failed.kind + ' failure at "' + S.failed.stage + '": ' + S.failed.error + ' (build ' + BUILD + ')'); } catch (e) { /* */ }
+    D.documentElement.classList.add('boot-failed');
+    whenDom(function () { var b = btn(); if (b) b.disabled = true; });
+    show(o.title || k[0], o.text || k[1], 'Stopped at: ' + S.failed.stage + (S.failed.error ? ' (' + S.failed.error + ')' : '') + ' · build ' + BUILD,
+      o.button || (o.kind === 'city' ? 'Retry' : 'Reload'), reload);
+    try { W.dispatchEvent(new CustomEvent('bs:boot-failed', { detail: S.failed })); } catch (e) { /* */ }
+  };
+  S.mark = function (name) { S.marks[name] = Date.now() - T0; S.lastProgress = Date.now(); };
+  S.state = function () { return { build: BUILD, marks: S.marks, failed: S.failed, slow: S.slow, ready: S.ready, stage: stageNow(), errors: S.errors.slice(), resources: S.resources }; };
+  /** a release that changed under an open tab (src/stream/streamer.js: a cell that is not the one its manifest names) */
+  S.releaseChanged = function (what) {
+    if (S.changed) return; S.changed = what || true;
+    show('Brisbane Streets has been updated.', 'Reload to keep playing on the new version (parts of the city may not load until you do).', 'build ' + BUILD, 'Reload', reload);
+  };
+  W.__boot = S;
+
+  // 0. import maps (the game's modules import 'three' by name through the import map below): iOS before 16.4 and some
+  //    in-app web views don't have them, and the load died with "Failed to resolve module specifier three". Said plainly
+  //    instead, before any module runs. (HTMLScriptElement.supports: Safari 16+, Chrome 96+, Firefox 94+ - a browser
+  //    without it is older than import maps anyway.)
+  // (only a browser that can ANSWER and says no is turned away: one without supports() - Chrome 89-95 has import maps
+  //  but not supports() - goes on and loads as it did before)
+  var IMPORTMAP = !(W.HTMLScriptElement && HTMLScriptElement.supports) || HTMLScriptElement.supports('importmap');
+  if (!IMPORTMAP || /[?&]noimportmap\b/.test(location.search)) S.fail('checking the browser', 'import maps not supported (' + (UA.match(/OS [\d_]+|Version\/[\d.]+|Chrome\/\d+/) || ['?'])[0] + ')', { kind: 'oldbrowser', button: 'Reload' });
+  // WebGL 2 is checked on the actual game canvas by renderer-start.js.
+  // Do not allocate and destroy a second graphics context as a capability probe.
+
+  // 2. a script or module that fails to download (a module whose import fails: the error lands on its <script>)
+  W.addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t !== W && t.tagName === 'SCRIPT') {
+      if (t.type === 'module' || t.hasAttribute('data-critical')) S.fail('downloading ' + (t.getAttribute('src') || 'a script') + (t.type === 'module' ? ' or a module it imports' : ''), 'a file did not load', { kind: 'script' });
+      return;
+    }
+    if (t && t !== W && t.tagName) return;                 // (an image or a sound: the game copes)
+    if (!S.marks['main-ready']) S.errors.push(short(e.error || e.message));   // (an error before the game's code ran to the end)
+  }, true);
+  // 3. the game's module ran to its end (src/main.js marks 'main' first thing, 'main-ready' last)? Module scripts run
+  //    before DOMContentLoaded, so by then it has - unless it threw, or a module it imports did
+  var waited = 0;
+  function checkStarted() {
+    if (S.failed || S.marks['main-ready']) return;
+    if (S.errors.length || waited >= 30000) { S.fail(S.marks.main ? 'starting the game' : 'loading the game code', S.errors[0] || 'the game code did not run', { kind: 'script' }); return; }
+    waited += 1000; setTimeout(checkStarted, 1000);
+  }
+  D.addEventListener('DOMContentLoaded', function () { setTimeout(checkStarted, 0); });
+
+  // 4. the watchdog: progress = the stage on the Play button, the loading bar, a file arriving, a mark. 90 s without any:
+  //    Retry offered, the load left running (a slow phone connection may still finish: it is never reloaded for you)
+  try { new PerformanceObserver(function (l) { S.resources += l.getEntries().length; }).observe({ type: 'resource', buffered: true }); } catch (e) { /* old browser */ }
+  var sig = '';
+  var dog = setInterval(function () {
+    var b = btn(), t = D.getElementById('title'), bar = D.querySelector('#launch-loading progress');
+    if (S.failed) { clearInterval(dog); return; }
+    if ((b && !b.disabled && /play|continue|recover/i.test(b.textContent || '')) || (t && t.classList.contains('city-ready')) || (t && t.classList.contains('hidden'))) {
+      S.ready = true; clearInterval(dog); if (S.slow) { S.slow = false; hide(); } return;
+    }
+    var now = stageNow() + '|' + (bar ? bar.value : '') + '|' + S.resources + '|' + Object.keys(S.marks).length;
+    if (now !== sig) { sig = now; S.lastProgress = Date.now(); if (S.slow) { S.slow = false; hide(); } return; }
+    if (!S.slow && Date.now() - S.lastProgress > STALL_MS) {
+      S.slow = true;
+      show('Still loading...', 'This is taking longer than usual. You can keep waiting, or try again.', 'Waiting at: ' + stageNow() + ' · build ' + BUILD, 'Retry', reload);
+    }
+  }, 2000);
+})();
+</script>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+</head>
+<body>
+<!-- #stage: everything in play. On a phone held upright it is turned a quarter turn to play sideways (src/device.js view,
+     style.css html.rotated); the title screen and the talk box stay outside, upright. -->
+<div id="stage">
+<canvas id="c"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="objective"><div class="label">OBJECTIVE</div><div id="objText"></div><div id="objDist"></div></div>
+  <div id="place"></div>
+  <div id="clock"></div>
+  <div id="stars"></div>
+  <canvas id="minimap" width="220" height="220"></canvas>
+  <div id="stats">
+    <div class="bar"><span>HEALTH</span><div class="track"><div id="hp"></div></div></div>
+    <div id="wallet">$40.00</div>
+    <div id="cred"></div>
+  </div>
+  <div id="lime" class="hidden">
+    <div class="brand">lyme</div>
+    <div id="kmh">0</div><div class="unit">km/h</div>
+    <div id="zone"></div>
+    <div id="helmet"></div>
+    <div id="fare"></div>
+    <div id="battery"></div>
+  </div>
+  <div id="prompt"></div>
+  <div id="subtitle"></div>
+  <div id="toast"></div>
+  <div id="wheelie" aria-live="off"></div>
+  <div id="bubbles"></div>
+  <div id="heads"></div>
+  <div id="perfhud" class="hidden"></div>
+  <div id="mic" class="hidden"><span class="dot"></span><span class="txt"></span></div>
+  <div id="crosshair"></div>
+  <div id="savestate" class="hidden" role="status" aria-live="polite"></div>
+  <div id="vignette"></div>
+  <div id="keys">WASD move · Shift run · Space jump / over a railing · LMB/F punch (hold: haymaker) · RMB / Q block · Z kick · R shove · Ctrl dodge · E interact / talk / pick up &amp; eat food · I shoo bin chickens off your food · G give $2 · Q bell (riding) · Space (hold) wheelie (riding) · H Lyme helmet · P call 000 · M map · J missions · ` first person · X×2 abandon · N night · C wardrobe</div>
+</div>
+
+<div id="bigmap" class="hidden"><canvas id="bigmapCanvas"></canvas><div class="hint"><span class="kbd-only">M to close</span><span class="touch-only">Tap to close</span></div></div>
+
+<div id="gfx" class="hidden"><div class="card">
+  <h2>Paused</h2>
+  <button class="resume">Resume</button>
+  <!-- the save actions (src/saveflow.js): Save & return to title, Restart mission (only while one runs), Return to City Hall -->
+  <div class="pause-actions">
+    <button type="button" data-pause="title">Save &amp; return to title</button>
+    <button type="button" data-pause="restart" hidden="">Restart mission</button>
+    <button type="button" data-pause="cityhall">Return to City Hall</button>
+  </div>
+  <p class="dim save-status" data-save-status="" role="status"></p>
+  <details class="controls"><summary>Controls</summary><div class="controls-host" data-controls-host=""></div></details>
+  <details class="settings" open=""><summary>Settings</summary>
+  <div class="row"><span class="lbl">Graphics</span><span class="presets"></span></div>
+  <details class="graphics-advanced"><summary>Advanced</summary>
+  <div class="row"><label><input type="checkbox" name="adaptive"> Adaptive resolution</label><span class="dim">aim for</span><select name="targetFps"></select></div>
+  <label class="row"><input type="checkbox" name="gtao"> Ambient occlusion <span class="dim">(Ctrl+Alt+K; costly)</span></label>
+  <label class="row"><input type="checkbox" name="bloom"> Night glow</label>
+  <label class="row"><input type="checkbox" name="overlay"> Performance overlay</label>
+  <p class="info"></p>
+  </details>
+  </details>
+  <p class="pause-links"><a data-community="discord" hidden="" target="_blank" rel="noopener" aria-label="Brisbane Streets Discord (opens in a new tab)">Discord</a> <a data-community="support" hidden="" target="_blank" rel="noopener" aria-label="Support Brisbane Streets (opens in a new tab)">Support the game</a></p>
+  <details class="report" data-diag-panel=""><summary>Report a problem</summary><p class="dim">The game version, device, errors and frame-rate readings from this device. Nothing is sent from here.</p><button type="button" data-diag="view">View report</button> <button type="button" data-diag="save">Save / share report</button><p class="dim" data-diag-status="" role="status"></p><textarea hidden="" readonly="" rows="6" spellcheck="false" aria-label="Diagnostics report"></textarea></details>
+</div></div>
+<div id="dead" class="hidden"><div class="card"><h2 id="deadTitle">You got rolled in the CBD.</h2><p id="deadText"></p><button id="respawnBtn">Wake up out the front of City Hall</button></div></div>
+</div>
+
+<div id="title">
+  <main class="launch-shell">
+    <header class="launch-header"><a class="launch-brand" href="./" aria-label="Brisbane Streets home">B<span>ST</span></a><button id="launch-fullscreen" type="button">Full screen</button><button id="launch-sound" type="button" aria-pressed="true" aria-label="Title music">🔊 Music: On</button></header>
+    <div class="launch-grid">
+      <section class="launch-copy" aria-labelledby="game-title">
+        <h1 id="game-title">BRISBANE<span>STREETS<span class="title-dot">.</span></span></h1>
+        <div id="launch-loading" role="status"><span id="launch-stage" aria-live="polite">Shooing bin chickens off the bitumen…</span><progress aria-label="Loading Brisbane"></progress></div><div id="boot-msg" role="alert" class=""><b>Brisbane couldn't load.</b><p>Part of the game did not download. Check your connection, then reload.</p><button type="button">Reload</button><small>Stopped at: downloading src/launch.js or a module it imports (a file did not load) · build f6ecdba-mvrorgq8</small></div><div class="launch-action"><button id="startBtn" disabled="" aria-describedby="launch-device" aria-live="polite">Loading Brisbane…</button><p id="launch-save" class="hidden" aria-live="polite"></p><button id="newGameBtn" type="button" class="launch-secondary hidden">New game</button><button id="onlineBtn" type="button" class="launch-secondary hidden" title="Walk the city with other players (beta: on foot)">Play online (beta)</button><p id="online-count" class="hidden" aria-live="polite"></p><form id="online-code" class="hidden" autocomplete="off"><label for="online-code-input" id="online-code-label">Online test code</label><input id="online-code-input" inputmode="numeric" maxlength="12" autocomplete="off" spellcheck="false" placeholder="Code"><label for="online-name-input" id="online-name-label">Your name online</label><input id="online-name-input" maxlength="16" autocomplete="nickname" spellcheck="false" placeholder="Your name"><button id="online-code-go" type="submit">Join</button></form><button id="launch-retry" type="button" class="hidden">Try loading again</button><p id="launch-device"></p></div>
+      </section>
+
+    </div>
+    <nav class="launch-bottom" aria-label="Game menu">
+      <details><summary>How to play</summary><div class="launch-panel controls-grid touch-help"><p><b>Left thumb</b> Move · drive · ride (push to the edge to sprint)</p><p><b>Right thumb</b> Look around · two fingers: camera in / out</p><p><b>Punch</b> Hold for a haymaker</p><p><b>Jump</b> Over a railing · <b>Brake</b> when driving (hold and steer: drift)</p><p><b>Block · Kick · Dodge</b> Fight back</p><p><b>E</b> Interact · get in / out · steal · take the helm · <b>Pick up</b> / <b>Eat</b> food</p><p><b>Shoo</b> Holding food: wave off a bin chicken winding up to lunge</p><p><b>Weapons</b> Opens the weapon wheel: tap Thongs, Bat or Boomerang · <b>Throw / Swing</b> hold to wind up, let go to throw / swing (the bat: tap again after a hit for the backhand, again for the overhead) · <b>Drop</b> put it down · walk up to one on the ground and tap <b>Pick up</b></p><p><b>Talk</b> Face someone, tap, type</p><p><b>🎤 Hold</b> Say it out loud (where the browser can listen)</p><p><b>Horn · Radio</b> When driving · <b>Siren</b> in a QPS car · <b>Bell</b> riding</p><p><b>Wheelie</b> Riding at speed, hold to lift the front (a Lyme: a manual). Let go before it tips too far or you loop out</p><p><b>Hover</b> The Metro: up over the traffic / land</p><p><b>Map · Jobs</b> City map · missions</p><p><b>•••</b> Call 000 · give $2 · outfit · night · bus doors · camera</p><p><b>II</b> Pause &amp; settings</p><p><b>★–★★★★★</b> Police hands → Glocks → SERT → POLAIR; hide 15 s to drop a star</p></div><div class="launch-panel controls-grid kbd-help"><p><kbd>W A S D</kbd> Move / drive / ride</p><p><kbd>Mouse</kbd> Look (click to lock) · driving: look round the car, it swings back behind after 2-3 s</p><p><kbd>Shift</kbd> Sprint · <b>driving:</b> handbrake (drift)</p><p><kbd>Space</kbd> Jump · over a railing · handbrake (drift) · <b>riding:</b> hold for a wheelie (let go before it tips over)</p><p><kbd>E</kbd> Interact · get in / out · steal · take the helm · pick up / eat food</p><p><kbd>I</kbd> Shoo a bin chicken off your food when it lunges</p><p><kbd>Tab (hold)</kbd> Weapon wheel: move the mouse or arrows to Thongs / Bat / Boomerang, let go to equip (Unarmed to put it away)</p><p><kbd>1 / LMB (hold)</kbd> Winds up what's in your hand; let go to throw the thong / boomerang or swing the bat · <b>the bat:</b> click again after a hit for the backhand, again for the overhead chop</p><p><kbd>2</kbd> Drop the weapon</p><p><kbd>E</kbd> Pick up a bat / boomerang, or put a thrown thong back on (walk up to it)</p><p><kbd>T</kbd> Talk to someone (face them)</p><p><kbd>V (hold)</kbd> Say it out loud (Chrome / Edge)</p><p><kbd>F / LMB</kbd> Punch (hold: haymaker) · <b>the Metro:</b> hover up / land</p><p><kbd>Q / RMB</kbd> Block · scooter bell · <b>driving:</b> hold Q to look behind</p><p><kbd>Z / R</kbd> Front kick / shove</p><p><kbd>Ctrl</kbd> Dodge</p><p><kbd>G</kbd> Give $2</p><p><kbd>P</kbd> Call Triple Zero</p><p><kbd>H</kbd> Horn · Lyme helmet</p><p><kbd>Y</kbd> Lights &amp; siren (a stolen QPS car)</p><p><kbd>Z / X</kbd> Indicators (driving)</p><p><kbd>B</kbd> Bus doors</p><p><kbd>1-5</kbd> Car radio stations (R next)</p><p><kbd>C</kbd> Change outfit</p><p><kbd>M</kbd> City map</p><p><kbd>J</kbd> Missions</p><p><kbd>N</kbd> Skip to night</p><p><kbd>X ×2</kbd> Abandon a mission</p><p><kbd>Esc</kbd> Pause &amp; settings</p><p><kbd>★–★★★★★</kbd> Police hands → Glocks → SERT → POLAIR; hide 15 s to drop a star</p></div></details>
+      <details><summary>Settings</summary><div class="launch-panel"><p class="settings-head">Graphics</p><label for="launch-quality">Quality</label> <select id="launch-quality"><option value="low">Performance (recommended)</option><option value="medium">Balanced</option><option value="high">Quality</option></select><button id="launch-apply" type="button">Save &amp; reload</button>
+        <!-- Saved game (src/saveflow.js): kept in this browser; export / import carry it between browsers -->
+        <div class="save-panel"><p class="settings-head">Saved game</p><p id="save-info" class="dim"></p><button id="save-export" type="button">Export save</button> <button id="save-import" type="button">Import save</button> <button id="save-new" type="button">Start new game</button><input id="save-file" type="file" accept=".json,application/json" hidden="" aria-label="Save file to import"><p class="dim">Saved in this browser only. Export to keep a copy or move it to another device.</p></div></div></details>
+      <details><summary>Privacy</summary><div class="launch-panel privacy-panel"><p id="ai-privacy">Chats with NPCs are processed by AI services and logged for up to 30 days to improve the game. Don't type personal info. Bot check by Cloudflare Turnstile: <a href="https://www.cloudflare.com/turnstile-privacy-policy/" target="_blank" rel="noopener">Turnstile Privacy Addendum</a>.</p><p><b>Play stats:</b> a random ID kept in your browser, with load time, play time, device type, screen size and which missions you finish. Kept up to 180 days.</p><p><b>Crash reports:</b> if the game stops without closing properly, your next visit sends the readings from its last couple of minutes: browser and device type, screen size, frame rate, graphics and memory readings, and where you were on the game's map (not your real location). Kept 30 days.</p><p>Both go only to the game's own server, to find what breaks. No names, no accounts, no IP addresses stored, nothing you type or say, no advertisers or third-party trackers.</p><p>Contains violence and strong language.</p><p class="stats-row"><label><input type="checkbox" id="stats-optin" checked=""> Send anonymous play stats and crash reports</label><span class="dim">Untick to stop both. Off by itself when your browser asks sites not to track (Do Not Track / Global Privacy Control). A crash report that isn't sent stays on this device: see Report a problem.</span></p></div></details>
+      <details><summary>Report a problem</summary><div class="launch-panel report-panel" data-diag-panel=""><p>Something wrong? This report lists the game version, your device type and screen, the loading steps, errors and frame-rate readings from your last visits, and any crash reports. Nothing is sent from here: view it, then save or share it to pass it on.</p><button id="diagnostic-view" type="button" data-diag="view">View report</button><button id="diagnostic-save" type="button" data-diag="save">Save / share report</button><p class="dim" data-diag-status="" role="status"></p><textarea id="diagnostic-report" hidden="" readonly="" rows="8" spellcheck="false" aria-label="Diagnostics report"></textarea></div></details>
+      <!-- community links (src/links.js COMMUNITY_LINKS; an unset one stays hidden): plain links in a new tab, shown while the
+           city loads too; no widget, no third-party script -->
+      <div class="launch-community" aria-label="Support and community">
+        <a id="launch-support" class="support-pill" data-community="support" hidden="" target="_blank" rel="noopener" aria-label="Support Brisbane Streets on Ko-fi (opens in a new tab)"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-9-5.4-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.6-9 12-9 12Z"></path></svg><span>Support the game<small>Help build what's next · Ko-fi</small></span><span class="external-mark" aria-hidden="true">↗</span></a>
+        <a id="launch-discord" class="discord-pill" data-community="discord" hidden="" target="_blank" rel="noopener" aria-label="Join the Brisbane Streets Discord (opens in a new tab)"><svg class="dc-mark" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"></path></svg><span>Join the Discord</span></a>
+        <a id="launch-creator" class="creator-pill" data-community="creator" hidden="" target="_blank" rel="noopener" aria-label="Created by @SohybQS, follow on X (opens in a new tab)"><span class="creator-x" aria-hidden="true">𝕏</span><span><small>Created by</small><strong>@SohybQS</strong></span><span class="external-mark" aria-hidden="true">↗</span></a>
+      </div>
+      <a id="launch-whatsnew" class="launch-link" hidden="" target="_blank" rel="noopener">What's new</a>
+      <a href="credits.html" target="_blank" rel="noopener">Credits</a>
+    </nav>
+    <!-- Glyph warm-up, laid out (unseen) behind the loading screen: the first ★ / 📻 / ⇧ / 🔋 in a HUD font makes Chrome
+         load a fallback font (Segoe UI Symbol / Emoji) for that face and size inside a frame, 15-80 ms each and ~200 ms
+         on the first car you steal (the radio line, the WANTED toast and zone). Same fonts and sizes as the HUD. -->
+    <div aria-hidden="true" style="position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;white-space:nowrap">
+      <span style="font:500 12px/1.35 system-ui,sans-serif">⇧ 📻 ★ ·</span><span style="font:600 12px/1.35 system-ui,sans-serif">📻 ⇧ ★</span>
+      <span style="font:700 14px/1.3 system-ui,sans-serif">📻 ★</span><span style="font-size:13px;font-weight:700">★ 🔋</span>
+      <span style="font-size:26px;font-weight:800">★ ✓</span><span style="font-size:15px;font-weight:600">🔋 ★</span><span style="font-size:12px">🔋 ★</span>
+      <span style="font-size:20px;font-weight:600">★ 📻</span><span style="font-size:22px;font-weight:900">★</span>
+    </div>
+  </main>
+</div>
+
+
+<script src="js/diagnostics.js"></script>
+<script type="module" src="js/launch.js"></script>
+<script type="module" src="js/main.js"></script>
+
+
+</body></html>
