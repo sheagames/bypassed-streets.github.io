@@ -1,4 +1,4 @@
-https://brisbane-streets.pages.dev - ORIGINAL CREATOR AND OWNER OF BRISBANE STREETS
+chttps://brisbane-streets.pages.dev - ORIGINAL CREATOR AND OWNER OF BRISBANE STREETS
 
 https://bypassed-streets.pages.dev - ALTERNATIVE URL SINCE ORIGINAL GOT BLOCKED :(
 
@@ -6,4 +6,4 @@ I DO NOT OWN NOR ASSOCIATE WITH BRISBANE STREETS OR ITS ASSETS IF YOU OWN ASSETS
 
 DO VISIT THE ORIGINAL OR ELSE
 
-(main/fish.jpg)
+![](fish.jpg)
