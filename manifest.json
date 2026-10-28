@@ -1,0 +1,17 @@
+{
+  "name": "Brisbane Streets",
+  "short_name": "Bris Streets",
+  "description": "Explore Brisbane: ride a Lime, drive, take the bus and dodge the cops. Free in your browser on phone or PC.",
+  "lang": "en-AU",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "background_color": "#132922",
+  "theme_color": "#142c24",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "assets/ui/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/ui/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/ui/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
