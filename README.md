@@ -1,4 +1,4 @@
-chttps://brisbane-streets.pages.dev - ORIGINAL CREATOR AND OWNER OF BRISBANE STREETS
+https://brisbane-streets.pages.dev - ORIGINAL CREATOR AND OWNER OF BRISBANE STREETS
 
 https://bypassed-streets.pages.dev - ALTERNATIVE URL SINCE ORIGINAL GOT BLOCKED :(
 
