@@ -1,0 +1,770 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #9cc4e4; font-family: "Segoe UI", Arial, sans-serif; color: #fff; }
+#c { display: block; width: 100vw; height: 100vh; }
+.hidden { display: none !important; }
+
+#title, #dead { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(160deg, rgba(122,31,61,.86), rgba(10,30,60,.8)); z-index: 20; }
+.card { max-width: 640px; padding: 28px 34px; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; text-align: center; backdrop-filter: blur(4px); }
+h1 { margin: 0 0 6px; font-size: 54px; line-height: .95; letter-spacing: 2px; color: #f2c418; text-shadow: 3px 3px 0 #7a1f3d; }
+h1 span { color: #fff; font-size: 40px; }
+.sub { margin: 4px 0 14px; color: #9fe38b; font-weight: 600; letter-spacing: 1px; }
+.card p { line-height: 1.45; opacity: .92; }
+table { margin: 14px auto; border-collapse: collapse; font-size: 14px; }
+td { padding: 3px 10px; text-align: left; }
+td:nth-child(odd) { color: #f2c418; font-weight: 700; text-align: right; }
+button { margin-top: 10px; padding: 12px 34px; font-size: 18px; font-weight: 700; border: 0; border-radius: 30px; background: #2fd12a; color: #0b2b0b; cursor: pointer; }
+button:disabled { background: #888; cursor: wait; }
+
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 5; text-shadow: 0 1px 3px rgba(0,0,0,.8); }
+#objective { position: absolute; left: 18px; top: 16px; max-width: 360px; padding: 10px 14px; background: rgba(0,0,0,.45); border-left: 4px solid #f2c418; border-radius: 6px; }
+#objective .label { font-size: 11px; letter-spacing: 2px; color: #f2c418; }
+#objText { font-size: 17px; font-weight: 600; margin-top: 2px; }
+#objDist { font-size: 13px; opacity: .8; margin-top: 3px; }
+#place { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); font-size: 20px; font-weight: 700; letter-spacing: .5px; transition: opacity .6s; }
+#stars { position: absolute; top: 64px; left: 50%; transform: translateX(-50%); font-size: 30px; letter-spacing: 3px; color: #f2c418; text-shadow: 0 0 6px #000, 0 0 2px #000; }
+#clock { position: absolute; top: 46px; left: 50%; transform: translateX(-50%); font-size: 13px; opacity: .85; }
+#minimap { position: absolute; right: 16px; top: 16px; width: 220px; height: 220px; border-radius: 50%; border: 3px solid rgba(255,255,255,.85); box-shadow: 0 2px 10px rgba(0,0,0,.5); background: #333; }
+#stats { position: absolute; left: 18px; bottom: 18px; width: 260px; padding: 10px 14px; background: rgba(0,0,0,.45); border-radius: 8px; }
+.bar { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 1px; margin: 4px 0; }
+.bar span { width: 64px; }
+.track { flex: 1; height: 10px; background: rgba(255,255,255,.2); border-radius: 5px; overflow: hidden; }
+#hp { height: 100%; width: 100%; background: linear-gradient(90deg, #d8323c, #ff6b5a); transition: width .15s; }
+#wallet { font-size: 22px; font-weight: 800; color: #9fe38b; margin-top: 6px; }
+#cred { font-size: 12px; opacity: .8; }
+#lime { position: absolute; right: 18px; bottom: 18px; width: 200px; padding: 12px 14px; background: rgba(14,20,14,.78); border: 2px solid #2fd12a; border-radius: 14px; text-align: center; }
+#lime .brand { font-weight: 900; font-size: 22px; color: #2fd12a; letter-spacing: 1px; }
+#kmh { font-size: 52px; font-weight: 800; line-height: 1; }
+#lime .unit { font-size: 12px; opacity: .75; }
+#zone { margin-top: 6px; font-size: 13px; font-weight: 700; padding: 3px 6px; border-radius: 6px; }
+#zone.road { background: #2d6b2d; } #zone.path { background: #b07d12; } #zone.noride { background: #b32424; } #zone.slow { background: #3d5fa8; }
+#helmet { margin-top: 4px; font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
+#helmet.road { background: #2d6b2d; } #helmet.noride { background: #b32424; }
+#fare, #battery { font-size: 12px; opacity: .85; margin-top: 3px; }
+#prompt { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); padding: 7px 14px; background: rgba(0,0,0,.55); border-radius: 6px; font-size: 15px; font-weight: 600; }
+#prompt:empty { display: none; }
+#subtitle { position: absolute; left: 50%; bottom: 70px; transform: translateX(-50%); font-size: 20px; font-weight: 600; max-width: 70vw; text-align: center; }
+/* the wheelie timer (src/wheelie.js): "WHEELIE 3.2 s · best 5.1" while the front is up; gold past your best */
+#wheelie { position: absolute; left: 50%; top: 21%; transform: translateX(-50%) scale(.92); padding: 4px 12px; border-radius: 8px; background: rgba(0,0,0,.45);
+  font: 800 20px/1.2 system-ui, "Segoe UI", sans-serif; letter-spacing: .5px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.8); white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; }
+#wheelie.on { opacity: 1; transform: translateX(-50%) scale(1); }
+#wheelie.pb { color: #f2c418; }
+html.touch #wheelie { top: 25%; font-size: 16px; }
+#toast { position: absolute; left: 50%; top: 32%; transform: translateX(-50%); font-size: 26px; font-weight: 800; color: #f2c418; text-align: center; transition: opacity .5s; }
+/* the Esc menu (graphics settings) and the performance overlay (src/graphics.js, src/perf.js) */
+#gfx { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .35); z-index: 40; }
+#gfx.hidden { display: none; }
+#gfx .card { background: rgba(18, 22, 28, .94); border-radius: 12px; padding: 20px 24px; min-width: 340px; max-width: 92vw; box-shadow: 0 10px 40px rgba(0, 0, 0, .5); }
+#gfx h2 { margin: 0 0 12px; font-size: 22px; }
+#gfx .row { display: flex; align-items: center; gap: 10px; margin: 9px 0; font-size: 15px; cursor: default; }
+#gfx label.row, #gfx .row label { cursor: pointer; }
+#gfx .row label { display: flex; align-items: center; gap: 10px; }
+#gfx select { background: rgba(255, 255, 255, .08); color: #fff; border: 1px solid rgba(255, 255, 255, .25); border-radius: 6px; padding: 3px 6px; font: inherit; }
+#gfx select:disabled { opacity: .45; }
+#gfx option { background: #12161c; }
+#gfx .lbl { min-width: 74px; opacity: .8; }
+#gfx .presets { display: flex; flex-wrap: wrap; gap: 6px; }
+#gfx .presets button { padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, .25); background: transparent; color: #fff; font-weight: 700; cursor: pointer; }
+#gfx .presets button.on { background: #f2c418; color: #111; border-color: #f2c418; }
+#gfx .dim { opacity: .55; font-size: 13px; }
+#gfx .info { font-size: 13px; opacity: .7; margin: 12px 0 14px; }
+#gfx .resume { padding: 8px 18px; border-radius: 8px; border: 0; background: #2ecc40; color: #111; font-weight: 800; cursor: pointer; }
+#perfhud { position: absolute; right: 12px; top: 250px; padding: 7px 10px; border-radius: 8px; background: rgba(0, 0, 0, .6); font: 600 12px/1.45 ui-monospace, Consolas, monospace;
+  white-space: pre; pointer-events: none; z-index: 30; }
+/* captions over the speaker's head (main.js drawCaptions): a bubble per line, following them */
+#heads { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+#heads .cap { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); max-width: 300px; width: max-content; padding: 6px 11px 7px;
+  background: rgba(255, 255, 255, .94); color: #15181c; border-radius: 12px; font-size: 15px; line-height: 1.3; font-weight: 600; text-align: center;
+  text-shadow: none; box-shadow: 0 2px 10px rgba(0, 0, 0, .28); transition: opacity .25s; will-change: transform; }
+#heads .cap::after { content: ""; position: absolute; left: 50%; bottom: -7px; margin-left: -7px; border: 7px solid transparent; border-bottom: 0;
+  border-top-color: rgba(255, 255, 255, .94); }
+#heads .cap .who { display: block; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #8a2342; margin-bottom: 1px; }
+#heads .cap.you { background: rgba(32, 94, 160, .92); color: #fff; }
+#heads .cap.you::after { border-top-color: rgba(32, 94, 160, .92); }
+#heads .cap.you .who { color: #cfe3ff; }
+#heads .cap.live { font-style: italic; opacity: .85; }
+#heads .tag { position: absolute; left: 0; top: 0; z-index: 2000; transform: translate(-50%, -100%); padding: 3px 9px; border-radius: 10px; background: rgba(40, 170, 90, .92);
+  color: #fff; font-size: 13px; font-weight: 800; white-space: nowrap; text-shadow: none; }
+/* the microphone: on, listening (src/npcai.js voice) */
+#mic { position: absolute; left: 50%; bottom: 168px; transform: translateX(-50%); padding: 6px 14px; border-radius: 16px; background: rgba(0, 0, 0, .62);
+  font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+#mic .dot { width: 10px; height: 10px; border-radius: 50%; background: #e5484d; box-shadow: 0 0 0 0 rgba(229, 72, 77, .7); animation: micpulse 1.2s infinite; }
+#mic.idle .dot { background: #8a8f98; animation: none; }
+@keyframes micpulse { 0% { box-shadow: 0 0 0 0 rgba(229, 72, 77, .7); } 70% { box-shadow: 0 0 0 9px rgba(229, 72, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0); } }
+#bubbles div { position: absolute; transform: translate(-50%, -100%); padding: 5px 10px; background: #fff; color: #111; border-radius: 10px; font-size: 14px; font-weight: 700; white-space: nowrap; text-shadow: none; }
+#bubbles div.angry { background: #ffdddd; color: #900; border: 2px solid #c22; }
+#bubbles div::after { content: ""; position: absolute; left: 50%; bottom: -8px; border: 8px solid transparent; border-top-color: inherit; border-bottom: 0; margin-left: -8px; border-top-color: #fff; }
+#crosshair { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: rgba(255,255,255,.7); }
+#vignette { position: absolute; inset: 0; box-shadow: inset 0 0 180px 60px rgba(200,0,0,.0); transition: box-shadow .3s; }
+#keys { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); font-size: 11px; opacity: .65; white-space: nowrap; }
+#bigmap { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; z-index: 10; }
+#bigmapCanvas { max-width: 94vw; max-height: 88vh; border-radius: 10px; box-shadow: 0 4px 30px rgba(0,0,0,.6); }
+#bigmap .hint { position: absolute; bottom: 14px; opacity: .7; }
+#dead h2 { color: #ff6b5a; font-size: 32px; margin: 0 0 8px; }
+@media (max-width: 1100px) {
+  #objective { max-width: 260px; }
+  #objText { font-size: 15px; }
+  #place { top: auto; bottom: 222px; font-size: 17px; }
+  #clock { top: auto; bottom: 204px; }
+  #subtitle { bottom: 150px; font-size: 16px; max-width: 60vw; }
+  #prompt { bottom: 104px; font-size: 13px; }
+  #stats { width: 200px; }
+  #lime { width: 170px; }
+  #kmh { font-size: 40px; }
+  #keys { display: none; }
+}
+/* Brisbane launch screen: static vector artwork, system fonts, no extra downloads. */
+#title { display:block; overflow-y:auto; overflow-x:hidden; background:#142c24; color:#f4f1df; padding:24px max(24px,env(safe-area-inset-right)) 20px max(24px,env(safe-area-inset-left)); }
+.launch-shell { max-width:1180px; margin:auto; }
+.launch-header { display:flex; align-items:center; gap:16px; font-size:10px; letter-spacing:2px; font-weight:700; }
+.launch-brand { display:flex; align-items:center; justify-content:center; width:40px; height:40px; background:#cefa57; color:#142c24; text-decoration:none; font-size:25px; letter-spacing:-3px; font-weight:900; }
+.launch-brand span { font-size:20px; }
+.build-badge { margin-left:auto; border:1px solid #55705c; padding:8px 12px; border-radius:3px; color:#cefa57; font-size:9px; letter-spacing:1px; }
+.launch-grid { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:24px; padding:35px 0 22px; }
+.launch-eyebrow { font-size:10px; letter-spacing:2px; color:#cefa57; font-weight:700; margin:0 0 22px; }
+#title h1 { color:#f4f1df; font-size:clamp(44px,6.5vw,84px); font-weight:950; letter-spacing:-4px; line-height:.9; text-shadow:none; margin:0; }
+#title h1>span { display:block; color:#cefa57; font-size:inherit; }
+#title h1 .title-dot { color:#f4f1df; font-size:inherit; }
+.launch-description { color:#b9c7ba; font-size:16px; line-height:1.65; margin:24px 0 18px; }
+.launch-tags { display:flex; flex-wrap:wrap; gap:12px; font-size:9px; letter-spacing:1px; color:#a5b6a6; }
+.launch-tags span+span::before { content:' / '; margin-right:12px; color:#cefa57; }
+.launch-action { margin-top:27px; }
+#startBtn { display:block; width:100%; max-width:355px; min-height:60px; margin:0; padding:15px 20px; border-radius:4px; background:#cefa57; color:#142c24; font-size:20px; text-align:left; transition:background .15s; }
+#startBtn:hover:enabled { background:#e0ff8a; }
+#startBtn:disabled { background:#304d3e; color:#d7e3c9; font-size:15px; cursor:progress; }
+#launch-device { color:#b9c7ba; font-size:11px; line-height:1.5; max-width:355px; margin:10px 0; }
+#ai-privacy { color:#b9c7ba; font-size:10px; line-height:1.45; max-width:380px; margin:4px 0 0; opacity:.85; text-shadow:0 1px 4px #000; }
+#ai-privacy[hidden] { display:none; }
+#ai-privacy a { color:inherit; text-decoration:underline; }
+.launch-note { color:#94aa98; font-size:10px; line-height:1.5; }
+.launch-art { margin:0; min-width:0; }
+.launch-art svg { width:100%; display:block; }
+.launch-art figcaption { display:flex; justify-content:space-between; gap:12px; font-size:8px; letter-spacing:1px; color:#a6baa4; padding:0 12px; }
+.launch-bottom { border-top:1px solid #405847; }
+.launch-bottom details { border-bottom:1px solid #405847; }
+.launch-bottom summary { cursor:pointer; list-style:none; padding:15px 0; font-size:13px; font-weight:600; }
+.launch-bottom summary::-webkit-details-marker { display:none; }
+.launch-bottom summary span { float:right; color:#cefa57; font-size:17px; }
+.launch-bottom details[open] summary span { transform:rotate(45deg); }
+.launch-panel { padding:0 0 18px; font-size:12px; line-height:1.65; color:#bdcbbd; max-width:900px; }
+.launch-panel a { color:#cefa57; }
+.controls-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px 20px; }
+.controls-grid p { margin:0; }
+.launch-panel kbd { display:inline-block; font:10px monospace; border:1px solid #6a8066; padding:5px; border-radius:3px; margin-right:7px; color:#f4f1df; }
+.launch-panel select { padding:10px; background:#203e30; color:#f4f1df; border:1px solid #6a8066; border-radius:3px; max-width:100%; }
+#launch-apply { font-size:12px; border-radius:3px; padding:11px 16px; background:#cefa57; margin:8px; }
+.launch-footer { display:flex; justify-content:flex-end; gap:12px; font-size:11px; letter-spacing:.5px; color:#849d89; padding:20px 0; }
+.launch-footer a { color:#849d89; text-decoration:none; }
+.launch-footer a:hover { color:#cefa57; text-decoration:underline; }
+#title :focus-visible { outline:3px solid #cefa57; outline-offset:5px; }
+@media(max-width:680px) {
+ #title { padding:16px max(20px,env(safe-area-inset-right)) 16px max(20px,env(safe-area-inset-left)); }
+ .launch-header { font-size:8px; letter-spacing:1px; gap:10px; }
+ .build-badge { font-size:7px; padding:7px; max-width:110px; line-height:1.5; }
+ .launch-grid { grid-template-columns:1fr; gap:12px; padding-top:28px; }
+ #title h1 { font-size:clamp(42px,12vw,74px); letter-spacing:-2px; }
+ .launch-eyebrow { font-size:8px; margin-bottom:16px; }
+ .launch-description { font-size:14px; margin:18px 0 14px; }
+ .launch-action { margin-top:20px; }
+ #startBtn { max-width:none; }
+ .launch-art { max-width:350px; width:100%; margin:auto; }
+ .launch-art figcaption { font-size:6px; }
+ .controls-grid { grid-template-columns:1fr 1fr; }
+ .launch-footer { font-size:7px; letter-spacing:.7px; }
+}
+@media(max-height:600px) and (min-width:681px) { .launch-grid { padding-top:20px; } .launch-art { max-width:380px; margin:auto; } #title h1 { font-size:58px; } .launch-description { margin:16px 0; } }
+
+#launch-retry { border-radius:4px; background:#eee7d1; font-size:14px; }
+
+/* Street-sign monogram: compact lettering instead of a generic arrow mark. */
+.launch-brand { width:48px; height:40px; border-radius:3px; letter-spacing:-1px; gap:2px; }
+.launch-brand span { font-size:10px; letter-spacing:0; align-self:flex-end; margin-bottom:9px; border-bottom:2px solid currentColor; }
+/* Full-screen game menu. The loaded city is rendered once behind this overlay. */
+#title { background:linear-gradient(90deg,rgba(12,24,22,.98) 0%,rgba(12,24,22,.86) 35%,rgba(12,24,22,.12) 78%),linear-gradient(0deg,rgba(8,18,16,.9),transparent 35%); }
+#title:not(.city-ready) { background:#132922; }
+.launch-shell { max-width:none; min-height:calc(100dvh - 44px); position:relative; display:flex; flex-direction:column; }
+.launch-header { padding-bottom:14px; border-bottom:1px solid #ffffff26; }
+.launch-brand { background:#f1c65b; border-left:5px solid #8c2447; }
+#launch-fullscreen { margin:0; padding:8px 12px; border:1px solid #ffffff40; border-radius:2px; background:transparent; color:#eee8cf; font-size:11px; }
+.launch-grid { display:block; padding:48px 2vw 12px; }
+.launch-copy { max-width:560px; }
+#title h1 { font-size:clamp(44px,7vw,96px); font-style:italic; letter-spacing:-4px; filter:drop-shadow(3px 4px 0 #11231c); }
+#title h1>span { color:#f3efd9; position:relative; }
+#title h1>span::after { content:''; display:block; width:140px; height:7px; background:linear-gradient(90deg,#8c2447 0 60%,#f1c65b 60%); margin-top:18px; }
+#title h1 .title-dot { color:#cefa57; }
+.launch-description { margin:18px 0; }
+.launch-art { position:absolute; right:3%; top:16%; width:52%; max-width:720px; z-index:-1; opacity:.8; }
+.city-ready .launch-art { display:none; }
+.launch-art figcaption { display:none; }
+.launch-action { margin-top:18px; }
+#startBtn { max-width:300px; border-radius:2px; min-height:52px; }
+#launch-loading { max-width:340px; margin:20px 0; font-size:13px; color:#e9e4cd; }
+#launch-loading progress { display:block; width:100%; height:5px; margin:12px 0; accent-color:#cefa57; }
+#launch-loading small { display:block; font-size:10px; color:#b5c2b2; }
+.city-ready #launch-loading { display:none; }
+#title:not(.city-ready) .launch-action #startBtn { display:none; }
+.launch-bottom { margin:0 2vw 24px; width:min(360px,100%); border-top:0; }
+.launch-bottom summary { padding:12px 0; font-size:15px; }
+.launch-panel { padding:12px; background:rgba(13,31,24,.95); border-radius:3px; }
+.controls-grid { grid-template-columns:1fr 1fr; }
+.launch-footer { margin-top:auto; border-top:1px solid #ffffff26; padding-bottom:max(8px,env(safe-area-inset-bottom)); }
+@media(max-width:680px) {
+ .launch-grid { padding:28px 0 12px; }
+ #title h1 { font-size:clamp(42px,12vw,74px); letter-spacing:-2px; }
+ .launch-art { width:85%; top:22%; right:-20%; opacity:.2; }
+ .launch-bottom { margin-left:0; }
+ #title { background:linear-gradient(90deg,rgba(12,24,22,.96),rgba(12,24,22,.58)),linear-gradient(0deg,#0c1816,transparent); }
+ .launch-header { flex-wrap:wrap; }
+ .build-badge { margin-left:auto; }
+ #launch-fullscreen { font-size:10px; }
+ .launch-description { font-size:13px; }
+}
+@media(max-height:650px) and (min-width:681px) {
+ .launch-grid { padding-top:22px; }
+ #title h1 { font-size:58px; }
+ .launch-description { margin:12px 0; }
+ .launch-bottom summary { padding:9px 0; }
+ .launch-note { margin-bottom:0; }
+}
+
+/* Compressed, static key art: no background video or animated scene cost. */
+#title, #title:not(.city-ready) {
+ background-color:#132922;
+ background-image:linear-gradient(90deg,rgba(5,18,14,.38),transparent 65%),linear-gradient(0deg,rgba(5,18,14,.85),transparent 35%),url('../images/brisbane-streets-key-art.webp');
+ background-size:cover; background-position:70% 58%;   /* (the chase: police car, bin chicken, clock tower) */
+}
+.launch-header { background:rgba(8,18,14,.6); margin:-24px -24px 0; padding:14px 24px; }
+.launch-description, #launch-device, .launch-note { color:#e2e8d9; text-shadow:0 1px 4px #000; }
+.launch-footer { color:#e0e6d7; }
+@media(max-width:680px) {
+ #title, #title:not(.city-ready) { background-position:72% 58%; background-image:linear-gradient(90deg,rgba(5,18,14,.78),rgba(5,18,14,.3)),url('../images/brisbane-streets-key-art.webp'); }
+ .launch-header { margin:-16px -20px 0; padding:12px 20px; }
+}
+
+/* the full controls list scrolls inside its panel */
+.controls-grid { max-height:48vh; overflow-y:auto; }
+.controls-grid kbd { white-space:nowrap; }
+
+/* load error: no bar or "building the city" line under "Brisbane could not load." (src/launch.js adds .load-failed) */
+#title.load-failed #launch-loading progress, #title.load-failed #launch-loading small { display:none; }
+#title.load-failed #launch-loading { margin-bottom:8px; }
+/* short windows (1280x720, 1366x768, 1280x600): the whole screen, footer included, fits without scrolling; the
+   title scales with the window height as well as its width */
+@media(max-height:800px) and (min-width:681px) {
+ .launch-grid { padding-top:24px; }
+ #title h1 { font-size:min(clamp(44px,7vw,96px),11vh); }
+ #title h1>span::after { margin-top:12px; }
+ .launch-eyebrow { margin-bottom:14px; }
+ #launch-device { max-width:460px; }
+ .launch-footer { padding:12px 0 max(4px,env(safe-area-inset-bottom)); }
+}
+@media(max-height:650px) and (min-width:681px) {
+ #title { padding-top:16px; padding-bottom:10px; }
+ .launch-shell { min-height:calc(100dvh - 26px); }
+ .launch-header { margin-top:-16px; padding:10px 24px; }
+ .launch-grid { padding-top:14px; padding-bottom:6px; }
+ .launch-eyebrow { display:none; }
+ #title h1 { font-size:min(58px,10vh); }
+ #launch-loading { margin:12px 0; }
+ .launch-action { margin-top:10px; }
+ #launch-device { margin:6px 0; }
+ .launch-footer { padding:8px 0 max(2px,env(safe-area-inset-bottom)); }
+}
+
+/* ---------------------------------------------------------------- phones and tablets (html.touch: src/device.js)
+   The on-screen controls (src/touch.js), a HUD laid out round the thumbs, safe areas (notch, home bar), and no page
+   zoom / selection / callout / overscroll anywhere in play. Desktop (no .touch) is untouched by all of this but the
+   #stage box (first rule below), which is the whole window there. */
+/* everything in play lives in #stage (src/device.js view). Desktop and a phone held sideways: it is the window. A phone
+   held upright: a landscape stage, innerHeight wide and innerWidth tall, turned a quarter turn clockwise to fill the
+   portrait screen (html.rotated) - the game's left edge then lies along the physical top (the notch), its right along
+   the bottom (the home bar), and the safe-area variables turn with it. The title screen and the talk box stay outside,
+   upright. (The stage is a stacking context: z-indexes inside it order only each other; the title (20) and the talk
+   box (40) are above all of it.) */
+#stage { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 1;
+  --sl: env(safe-area-inset-left); --sr: env(safe-area-inset-right); --st: env(safe-area-inset-top); --sb: env(safe-area-inset-bottom); --k: 1; }
+html.touch #stage { height: 100dvh; }
+html.rotated #stage { width: 100dvh; height: 100vw; transform-origin: 0 0; transform: rotate(90deg) translate(0, -100%);
+  --sl: env(safe-area-inset-top); --sr: env(safe-area-inset-bottom); --st: env(safe-area-inset-left); --sb: env(safe-area-inset-right); }
+/* compact modes: short landscape phones a touch smaller; tablets bigger (src/device.js sets the same on the stage) */
+@media (max-height: 340px) { #stage { --k: .86; } }
+@media (min-height: 560px) and (min-width: 900px) { #stage { --k: 1.2; } }
+
+.touch-help, .touch-only { display: none; }
+html.touch .touch-help { display: grid; }
+html.touch .touch-only { display: inline; }
+html.touch .kbd-help, html.touch .kbd-only { display: none; }
+.touch-help b { color: #f4f1df; font-weight: 700; margin-right: 4px; }
+html.touch, html.touch body { overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+html.touch body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html.touch #stage, html.touch #c, html.touch #hud, html.touch #touchui, html.touch #bigmap { touch-action: none; }
+html.touch #c { position: absolute; inset: 0; width: 100%; height: 100%; }   /* (of #stage: the window, or the turned stage) */
+html.touch #title { touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+html.touch input, html.touch textarea, html.touch select { -webkit-user-select: text; user-select: text; }
+html.touch #title button, html.touch #gfx button, html.touch #dead button { touch-action: manipulation; }
+
+/* (no position on #touchui itself: a fixed box would make one stacking context of it, and the zones must stack under the
+   mission list and the big map while the buttons stack over them) */
+#touchui { pointer-events: none; font-family: system-ui, "Segoe UI", sans-serif; }   /* (--sl/--sr/--st/--sb and --k: inherited from #stage) */
+#touchui.off { display: none; }
+/* (the look / move zones sit under the mission list, the big map and the Esc menu: z-index 9; the buttons 35) */
+#touchui .tz { position: fixed; top: 0; bottom: 0; pointer-events: auto; z-index: 9; }
+#touchui .tz-move { left: 0; width: 45%; }
+#touchui .tz-look { right: 0; width: 55%; }
+/* the joystick: a 122 px base, 54 px knob; it waits bottom left and comes to the thumb */
+#touchui .joy { position: fixed; width: calc(122px * var(--k)); height: calc(122px * var(--k)); transform: translate(-50%, -50%); border-radius: 50%;
+  background: rgba(20,24,30,.28); border: 2px solid rgba(255,255,255,.38); pointer-events: none; z-index: 36; transition: opacity .15s; }
+#touchui .joy.rest { left: calc(var(--sl) + 76px * var(--k) + 61px * var(--k)); top: calc(100% - var(--sb) - 37px * var(--k) - 61px * var(--k)); opacity: .55; }
+#touchui .joy-knob { position: absolute; left: 50%; top: 50%; width: calc(54px * var(--k)); height: calc(54px * var(--k)); margin: calc(-27px * var(--k)) 0 0 calc(-27px * var(--k)); border-radius: 50%;
+  background: rgba(255,255,255,.62); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+#touchui .hidden { display: none; }
+/* round, translucent dark, white icon over a small label */
+#touchui .tb { position: absolute; margin: 0; padding: 0; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.4); background: rgba(14,18,24,.42);
+  color: #fff; font: 700 9px/1 system-ui, "Segoe UI", sans-serif; letter-spacing: .3px; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,.8);
+  pointer-events: auto; cursor: default; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+#touchui .tb svg { width: 44%; height: 44%; display: block; }
+#touchui .tb .lb { display: block; opacity: .9; }
+#touchui .tb.on { background: rgba(242,196,24,.6); border-color: #f2c418; color: #111; text-shadow: none; }
+#touchui .tb.xl { width: calc(79px * var(--k)); height: calc(79px * var(--k)); font-size: 10px; }
+#touchui .tb.l { width: calc(58px * var(--k)); height: calc(58px * var(--k)); }
+#touchui .tb.m { width: calc(50px * var(--k)); height: calc(50px * var(--k)); }
+#touchui .tb.s { width: calc(42px * var(--k)); height: calc(42px * var(--k)); font-size: 8px; }
+#touchui .tb.s svg { width: 40%; height: 40%; }
+/* the right-hand cluster (offsets from the bottom-right corner; 2026-10-08): the big button in the corner, then two
+   arcs round it, centred 57 px in from the corner - the inner one (58 px buttons, r 128) at 180 / 150 / 120 / 90
+   degrees, the outer one (50 px, r 200) at 180 / 162 / 144 / 126 / 108 / 90. The outer one is mostly the offered
+   ("when") buttons, so most of the time only Dodge shows there. */
+#touchui .tb-act { position: fixed; right: var(--sr); bottom: var(--sb); width: 1px; height: 1px; pointer-events: none; z-index: 35; }
+#touchui[data-ctx="foot"] [data-show]:not([data-show~="foot"]),
+#touchui[data-ctx="drive"] [data-show]:not([data-show~="drive"]),
+#touchui[data-ctx="ride"] [data-show]:not([data-show~="ride"]),
+#touchui[data-ctx="seat"] [data-show]:not([data-show~="seat"]),
+#touchui [data-when]:not(.avail) { display: none; }
+#touchui .b-punch, #touchui .b-brake, #touchui .b-bell { right: calc(18px * var(--k)); bottom: calc(18px * var(--k)); }
+#touchui .b-jump, #touchui .b-horn, #touchui .b-wheelie { right: calc(156px * var(--k)); bottom: calc(28px * var(--k)); }
+#touchui .b-kick { right: calc(139px * var(--k)); bottom: calc(92px * var(--k)); }
+#touchui .b-block { right: calc(92px * var(--k)); bottom: calc(139px * var(--k)); }
+#touchui .b-sprint, #touchui .b-radio, #touchui .b-weapons { right: calc(28px * var(--k)); bottom: calc(156px * var(--k)); }
+#touchui .b-dodge { right: calc(232px * var(--k)); bottom: calc(32px * var(--k)); }
+#touchui .b-use { right: calc(222px * var(--k)); bottom: calc(94px * var(--k)); background: rgba(30,110,60,.5); }
+/* the Metro's HOVER (a tap: up / down): only while you drive the Metro, outside the horn on the outer arc */
+#touchui .b-hover { right: calc(236px * var(--k)); bottom: calc(26px * var(--k)); background: rgba(150,200,240,.32) !important; border-color: rgba(223,241,255,.85) !important; }
+#touchui:not([data-metro]) .b-hover { display: none; }
+/* a stolen QPS car's SIREN (a tap: lights and siren on / off): only in a police car, on the outer arc beside the horn
+   (the Metro's HOVER spot: never both); lit red-blue while the siren is on */
+#touchui .b-siren { right: calc(230px * var(--k)); bottom: calc(26px * var(--k)); }
+#touchui:not([data-police]) .b-siren { display: none; }
+#touchui .tb-act .b-siren.lit { background: linear-gradient(90deg, rgba(220,40,40,.62) 50%, rgba(40,80,230,.62) 50%); border-color: #fff; }
+/* SHOO (.b-guard; a tap: you wave the bin chicken off your food): only while you hold food (or the pie mission's thief is about),
+   big, on the inner arc where Kick and Block sit (hidden meanwhile); it flashes red as a bin chicken winds up to lunge */
+#touchui .b-guard { right: calc(112px * var(--k)); bottom: calc(112px * var(--k)); background: rgba(200,150,40,.42) !important; border-color: rgba(255,226,140,.9) !important; }
+#touchui:not([data-food]) .b-guard { display: none; }
+#touchui[data-food] .b-kick, #touchui[data-food] .b-block { display: none; }
+/* a weapon in hand (src/weapons.js): Throw / Swing where Kick sits, Drop by it; hidden otherwise */
+#touchui:not([data-weapon]) .b-weapon, #touchui:not([data-wdrop]) .b-wdrop { display: none; }
+#touchui[data-weapon] .b-kick, #touchui[data-weapon] .b-dodge { display: none; }
+#touchui .b-weapon { right: calc(139px * var(--k)); bottom: calc(92px * var(--k)); background: rgba(60,120,200,.45) !important; }
+#touchui .b-wdrop { right: calc(232px * var(--k)); bottom: calc(32px * var(--k)); }
+/* the weapon wheel (src/weapons.js): the slots you have round a ring in the middle of the screen, GTA-style (N spread evenly: the transform is set per slot) */
+#wwheel { position: absolute; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(0,0,0,.35) 0, rgba(0,0,0,.15) 60%, transparent 75%); pointer-events: auto; }
+#wwheel.hidden { display: none; }
+/* the pick-up prompt over a weapon / your thrown thong (src/weapons.js): a GTA-style key hint */
+#wpick { position: absolute; left: 0; top: 0; z-index: 40; pointer-events: none; display: flex; align-items: center; gap: 6px; padding: 4px 9px 4px 5px; border-radius: 6px; background: rgba(10,12,16,.72); color: #fff; font: 600 13px/1 system-ui, sans-serif; white-space: nowrap; text-shadow: 0 1px 2px #000; }
+#wpick .wp-k { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: #fff; color: #111; font-weight: 800; text-shadow: none; }
+#wwheel .ww-ring { position: relative; width: min(64vmin, 340px); height: min(64vmin, 340px); border-radius: 50%; background: rgba(12,14,18,.62); border: 2px solid rgba(255,255,255,.18); }
+#wwheel .ww-slot { position: absolute; left: 50%; top: 50%; width: 34%; height: 34%; margin: -17% 0 0 -17%; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); background: rgba(40,44,52,.85); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 600 12px/1.1 system-ui, sans-serif; cursor: pointer; padding: 0; }
+#wwheel .ww-slot svg { width: 42%; height: 42%; }
+#wwheel .ww-slot.on { border-color: #ffd23a; }
+#wwheel .ww-slot.sel { background: rgba(255,210,58,.9); color: #111; }
+#wwheel .ww-c { font-weight: 400; font-size: 11px; opacity: .85; min-height: 11px; }
+#wwheel .ww-mid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #fff; font: 700 14px system-ui, sans-serif; text-align: center; text-shadow: 0 1px 2px #000; pointer-events: none; }
+#touchui .tb-act .b-guard.lit { background: rgba(220,50,40,.72) !important; border-color: #fff !important; animation: tb-guard .3s ease-in-out infinite alternate; }
+@keyframes tb-guard { from { transform: scale(1); } to { transform: scale(1.12); } }
+@media (prefers-reduced-motion: reduce) { #touchui .tb-act .b-guard.lit { animation: none; } }
+#touchui .b-talk { right: calc(194px * var(--k)); bottom: calc(150px * var(--k)); background: rgba(32,94,160,.5); }
+#touchui .b-mic { right: calc(150px * var(--k)); bottom: calc(194px * var(--k)); }
+#touchui .b-call { right: calc(94px * var(--k)); bottom: calc(222px * var(--k)); background: rgba(160,30,40,.5); }
+#touchui .b-give { right: calc(32px * var(--k)); bottom: calc(232px * var(--k)); background: rgba(40,120,60,.45); }
+/* driving / riding: Get out (Use) on the inner arc, between the horn and the radio (riding: Sprint) */
+#touchui[data-ctx="drive"] .b-use, #touchui[data-ctx="ride"] .b-use, #touchui[data-ctx="seat"] .b-use { right: calc(122px * var(--k)); bottom: calc(122px * var(--k)); }
+/* lighter, quieter buttons; an offered one gets a gold rim and pulses as it appears (src/touch.js offers) */
+#touchui .tb-act .tb { background-color: rgba(14,18,24,.32); border-color: rgba(255,255,255,.34); box-shadow: 0 1px 6px rgba(0,0,0,.2); }
+#touchui .tb-act .tb .lb { font-size: 7.5px; letter-spacing: .4px; opacity: .82; }
+#touchui .tb-act .tb.xl .lb { font-size: 9px; }
+#touchui .tb-act [data-when].avail { border-color: rgba(242,196,24,.85); }
+#touchui .tb-act .tb.fresh { animation: tb-fresh .5s ease-out 3; }
+#touchui .tb-act .tb.on { background-color: rgba(242,196,24,.6); border-color: #f2c418; }
+@keyframes tb-fresh { from { box-shadow: 0 0 0 0 rgba(242,196,24,.9); } to { box-shadow: 0 0 0 14px rgba(242,196,24,0); } }
+@media (prefers-reduced-motion: reduce) { #touchui .tb-act .tb.fresh { animation: none; } }
+/* top left, next to the minimap: map, missions, more, pause (32 px) */
+#touchui .tb-top { position: fixed; top: calc(var(--st) + 8px); left: calc(var(--sl) + 104px); display: flex; gap: 6px; z-index: 35; }
+#touchui .tb-top .tb { position: static; border-radius: 9px; width: 32px; height: 32px; }
+#touchui .tb-top .tb svg { width: 60%; height: 60%; }
+#touchui .tb-top .b-pov.lit { background: rgba(255,196,60,.6); border-color: #fff; }   /* first person on */
+/* the top Weapons button only for a passenger (online): on foot the action cluster has its own (touch.js BUTTONS
+   'weapons'), and in a vehicle or on a ride the wheel doesn't open (weapons.js show). The row is five wide again with the
+   eye in it: on a ~667 px phone the top-centre toast (#htToast) reaches the last button at most, as before the eye */
+#touchui:not([data-ctx="seat"]) .tb-top .b-wheel { display: none; }
+#touchui .tb-more { position: fixed; top: calc(var(--st) + 46px); left: calc(var(--sl) + 104px); width: min(330px, calc(var(--gw, 100vw) * .56)); max-height: calc(100% - 56px); overflow-y: auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px; border-radius: 12px; background: rgba(10,14,20,.88); pointer-events: auto; z-index: 37; }
+#touchui .tb-more.hidden { display: none; }
+#touchui .tb-more .tb { position: static; width: auto; height: 36px; border-radius: 8px; font-size: 11px; text-transform: none; }
+#touchui[data-pov="1"] [data-zoom] { display: none; }   /* first person applied: no follow camera to zoom (main.js POV) */
+#touchui.paused .tb-act, #touchui.paused .tb-more, #touchui.paused .joy { display: none; }
+#touchui.map .tb-act, #touchui.map .joy, #touchui.map .tz { display: none; }
+/* the HUD on a phone (2026-10-08, tidied like a mobile action game; src/hudtidy.js does the timing): the corners only,
+   nothing under the thumbs. Top left: the minimap, the top buttons, the objective in one line that fades. Top right:
+   money + health, the stars. Top centre: one short toast at a time. Bottom centre: two lines of subtitles at most.
+   Driving / riding: a small speedometer above the right-hand buttons. No key hints anywhere (the buttons say it). */
+html.touch #keys, html.touch #place, html.touch #clock, html.touch #prompt, html.touch #toast { display: none !important; }
+html.touch #swatChip, html.touch #radioHud, html.touch #radioToast { display: none !important; }
+html.touch #minimap { top: calc(var(--st) + 8px); right: auto; left: calc(var(--sl) + 10px); width: 88px; height: 88px; border-width: 2px; }
+html.touch #objective { left: calc(var(--sl) + 104px); top: calc(var(--st) + 46px); max-width: min(300px, calc(var(--gw, 100vw) * .3)); padding: 3px 9px 4px;
+  border-left-width: 3px; border-radius: 5px; background: rgba(0,0,0,.38); display: flex; gap: 6px; align-items: baseline; white-space: nowrap; transition: opacity .6s; }
+html.touch #objective .label { display: none; }
+html.touch #objText { font-size: 12px; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+html.touch #objDist { font-size: 11px; margin: 0; flex: none; color: #ffe27a; opacity: .95; }
+html.touch #objective.ht-away { opacity: 0; }
+html.touch #stats { left: auto; right: calc(var(--sr) + 10px); top: calc(var(--st) + 8px); bottom: auto; width: 150px; padding: 3px 10px; display: flex; align-items: center; gap: 8px;
+  background: rgba(0,0,0,.38); border-radius: 12px; }
+html.touch #stats .bar { flex: 1; margin: 0; }
+html.touch #stats .bar span { display: none; }
+html.touch #stats .track { height: 5px; }
+html.touch #wallet { font-size: 13px; margin: 0; }
+html.touch #cred { display: none; }
+html.touch #stars { left: auto; right: calc(var(--sr) + 12px); transform: none; top: calc(var(--st) + 34px); font-size: 16px; letter-spacing: 2px; }
+html.touch #stars.seen { animation: stars-seen 1s steps(1) infinite; }      /* the police have eyes on you */
+html.touch #stars.search { opacity: .75; }                                   /* they're looking: hide and they give up */
+@keyframes stars-seen { 50% { color: #ff4a3a; } }
+html.touch #perfhud { top: 70px; right: auto; left: 50%; transform: translateX(-50%); font-size: 10px; }
+/* subtitles: the newest line and one older (fainter, one line), the speaker's name small */
+/* the bottom-centre lane: between the stick's resting place and the right-hand buttons' outer arc, whatever the phone's
+   width; each line as wide as its text, centred in the lane (subtitles, the prompt chip, the missions' lines) */
+html.touch #subtitle, #htHint, html.touch #msn-sub, html.touch #msn-hint, html.touch #msn-prompt { left: min(calc(var(--sl) + 268px * var(--k)), calc(var(--gw, 100vw) * .3));
+  right: min(calc(var(--sr) + 300px * var(--k)), calc(var(--gw, 100vw) * .36)); width: fit-content; max-width: 460px; margin: 0 auto; transform: none; }
+html.touch #subtitle { bottom: calc(var(--sb) + 8px); font-size: 12.5px; line-height: 1.3; }
+html.touch #subtitle > div { width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 3px; padding: 2px 9px 3px;
+  background: rgba(0,0,0,.34); border-radius: 7px; }
+html.touch #subtitle > div:not(:nth-last-child(-n+2)) { display: none; }
+html.touch #subtitle > div:not(:last-child) { -webkit-line-clamp: 1; opacity: .6; }
+html.touch #subtitle > div > span:first-child { font-size: 9.5px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: #f2c418; opacity: .95 !important; }
+html.touch #heads .cap { max-width: 180px; font-size: 11.5px; padding: 4px 8px 5px; }
+/* the toast (src/hudtidy.js): one at a time, top centre */
+#htToast { position: absolute; left: 50%; top: calc(var(--st) + 9px); transform: translate(-50%, -6px); max-width: calc(var(--gw, 100vw) * .32); padding: 4px 14px 5px;
+  border-radius: 14px; background: rgba(10,14,22,.72); text-align: center; white-space: nowrap; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; }
+#htToast.on { opacity: 1; transform: translate(-50%, 0); }
+#htToast .m { display: block; overflow: hidden; text-overflow: ellipsis; font: 700 13px/1.3 system-ui, "Segoe UI", sans-serif; color: #f2c418; }
+#htToast .s { display: block; overflow: hidden; text-overflow: ellipsis; font: 500 10.5px/1.3 system-ui, "Segoe UI", sans-serif; opacity: .8; }
+#htToast .s:empty { display: none; }
+#htToast.alert { background: rgba(130,18,18,.8); }
+#htToast.alert .m { color: #fff; }
+#htToast.warn .m { color: #ffd24a; }
+#htToast.radio .m, #htToast.veh .m, #htToast.place .m { color: #fff; }
+#htToast.place { background: rgba(10,14,22,.5); }
+#htToast.place .m { font-weight: 600; font-size: 12px; }
+/* what's left of the prompt line once its key hints are buttons ("No parking in the Mall") */
+#htHint { position: absolute; bottom: calc(var(--sb) + 66px); padding: 3px 10px;
+  border-radius: 10px; background: rgba(0,0,0,.45); font: 600 11px/1.3 system-ui, "Segoe UI", sans-serif; text-align: center; display: none; }
+#htHint.on { display: block; }
+/* the vehicle panel: a small speedometer above the right-hand buttons; the name is a toast when you get in, the wanted
+   level is the stars, the keys are the buttons */
+html.touch #lime { left: auto; right: calc(var(--sr) + 14px); top: auto; bottom: calc(var(--sb) + 222px * var(--k)); width: 84px; padding: 4px 6px 6px;
+  border: 0; border-radius: 12px; background: rgba(8,12,18,.5); }
+html.touch #lime .brand, html.touch #busSign { display: none !important; }
+html.touch #kmh { font-size: 26px; }
+html.touch #lime .unit { font-size: 9px; letter-spacing: .5px; }
+html.touch #zone { margin-top: 3px; font-size: 9px; padding: 2px 4px; border-radius: 5px; }
+html.touch #helmet { font-size: 9px; padding: 1px 4px; }
+html.touch #fare, html.touch #battery { font-size: 10px; margin-top: 2px; }
+html.touch #lime[data-mode="drive"] #zone, html.touch #lime[data-mode="helm"] #zone,
+html.touch #lime:not([data-mode="ride"]) #fare, html.touch #lime:not([data-mode="ride"]) #battery, html.touch #lime[data-mode="ride"] #fare { display: none; }
+html.touch #vdmg { margin-top: 4px; }
+html.touch #vdmg .bar { height: 4px; }
+html.touch #vdmg .txt { font-size: 9px; }
+html.touch #vdmg:not(.fire) .txt { display: none; }
+html.touch #mic { bottom: auto; top: 30%; }
+html.touch #fr-btn { display: none !important; }
+html.touch #gfx .card { min-width: 0; max-width: calc(var(--gw, 100vw) * .92); max-height: calc(var(--gh, 100vh) * .92); overflow-y: auto; padding: 14px 16px; }
+html.touch #dead .card { max-width: calc(var(--gw, 100vw) * .9); padding: 16px 20px; }
+html.touch #bigmapCanvas { max-width: calc(var(--gw, 100vw) * .94); max-height: calc(var(--gh, 100vh) * .94); }
+/* the missions (src/missions/ui.js) on a phone: their panel where the objective is, their lines where the subtitles are */
+html.touch #msn-hud { width: min(260px, calc(var(--gw, 100vw) * .3)); left: calc(var(--sl) + 104px); top: calc(var(--st) + 46px); padding: 4px 8px 6px; border-left-width: 3px; }
+html.touch #msn-hud .obj { font-size: 12px; }
+html.touch #msn-hud .sub { font-size: 10.5px; }
+html.touch #msn-hud .timer { font-size: 15px; }
+html.touch #msn-card { width: min(330px, calc(var(--gw, 100vw) * .46)); right: auto; left: 50%; transform: translate(-50%, -50%); max-height: calc(var(--gh, 100vh) * .86); overflow-y: auto; padding: 12px 14px; }
+html.touch #msn-card h3 { font-size: 19px; }
+html.touch #msn-card .blurb { font-size: 12px; margin: 8px 0; }
+html.touch #msn-result { width: min(440px, calc(var(--gw, 100vw) * .7)); max-height: calc(var(--gh, 100vh) * .9); overflow-y: auto; }
+html.touch #msn-list { width: min(360px, calc(var(--gw, 100vw) * .52)); top: calc(var(--st) + 8px); bottom: 8px; right: calc(var(--sr) + 8px); }
+html.touch #msn-hint, html.touch #msn-prompt { bottom: calc(var(--sb) + 66px); font-size: 12px; padding: 4px 10px; white-space: normal; }
+html.touch #msn-prompt b { display: none; }
+html.touch #msn-big { font-size: 26px; top: 30%; }
+html.touch #msn-toast { top: calc(var(--st) + 46px); font-size: 16px; }
+html.touch #msn-sub { bottom: calc(var(--sb) + 8px); font-size: 12.5px; }
+/* the talk box on a phone: Send / close buttons, sits above the keyboard (src/touch.js placeTalk) */
+#talkbox .talk-send, #talkbox .talk-close { margin: 0; padding: 8px 14px; font-size: 15px; border-radius: 8px; touch-action: manipulation; }
+#talkbox .talk-close { background: rgba(255,255,255,.18); color: #fff; padding: 8px 12px; }
+html.touch #talkbox { max-width: calc(100vw - 16px); }
+html.touch #talkbox input { width: min(520px, 58vw) !important; font-size: 16px !important; }
+
+/* Phone held upright: "cover" would show a thin slice of the 16:9 key art. Size it so the whole chase (police car,
+   bin chicken on the Lyme scooter, City Hall's clock tower: 47-91% across the picture) fits the screen width, centred
+   behind the buttons; dark fades top and bottom keep the text readable, the rest is the art's own night colour. */
+@media (max-width:680px) and (orientation:portrait) {
+ #title, #title:not(.city-ready) {
+  background-color:#0b1712;
+  /* 1: a fade the same size and place as the picture, so its top and bottom melt into the background;
+     2: a light wash for the text; 3: the picture (whole chase across the width) */
+  background-image:
+   linear-gradient(180deg,#0b1712 0%,rgba(11,23,18,0) 22%,rgba(11,23,18,0) 72%,#0b1712 100%),
+   linear-gradient(180deg,rgba(5,18,14,.55) 0%,rgba(5,18,14,.25) 40%,rgba(5,18,14,.35) 100%),
+   url('../images/brisbane-streets-key-art.webp');
+  background-size:200vw 112.6vw, 100% 100%, 200vw auto;
+  background-position:90% 54%, center, 90% 54%;   /* (shows 45-95% across: the whole bin chicken, scooter wheel to beak) */
+  background-repeat:no-repeat;
+ }
+}
+
+/* the rotating loading lines (src/loadquips.js): a quick fade-up for each new one */
+#launch-stage.quip-in { animation: quip-in .35s ease-out; }
+@keyframes quip-in { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { #launch-stage.quip-in { animation:none; } }
+
+/* Title screen, simplified (2026-10-08): logo, title, Play and the loading line; everything else is one row of small
+   links at the bottom whose panels open above it */
+.launch-bottom { display:flex; flex-wrap:wrap; align-items:center; gap:4px 20px; border:0; position:relative; width:auto; margin-top:auto; padding:10px 0 max(10px,env(safe-area-inset-bottom)); }
+.launch-bottom details { border:0; position:static; }
+.launch-bottom summary, .launch-bottom > a { padding:6px 0; font-size:12px; font-weight:600; letter-spacing:.4px; color:#d8e2d0; opacity:.8; text-decoration:none; text-shadow:0 1px 4px #000; }
+.launch-bottom summary:hover, .launch-bottom > a:hover, .launch-bottom details[open] summary { opacity:1; color:#cefa57; }
+.launch-bottom details[open] > .launch-panel { position:absolute; left:0; bottom:100%; margin:0 0 6px; width:min(620px, calc(100vw - 32px)); max-height:min(60vh, 420px); overflow:auto; background:#0c140fef; border:1px solid #405847; border-radius:8px; padding:14px 16px; z-index:20; box-shadow:0 10px 30px #000a; }
+.launch-bottom .launch-panel select, .launch-bottom .launch-panel button { margin:6px 8px 0 0; }
+#launch-device:empty { display:none; }
+#launch-stage { color:#eee8cf; text-shadow:0 1px 6px #000, 0 0 2px #000; }
+
+/* Play + loading (2026-10-08): a proper game button (rounded, glowing, a play triangle, a gentle pulse once ready) and a
+   thicker rounded loading bar; on a phone held upright both sit at the bottom, under the thumb, clear of the key art */
+#startBtn { display:flex; align-items:center; justify-content:center; gap:12px; width:100%; max-width:320px; min-height:60px; padding:14px 28px;
+  border:0; border-radius:16px; background:linear-gradient(180deg,#dcff74,#b8ec2e); color:#10241b; font-size:21px; font-weight:800;
+  letter-spacing:1.5px; text-transform:uppercase; text-align:center; box-shadow:0 6px 0 #6f9a12, 0 10px 28px rgba(206,250,87,.35);
+  transition:transform .12s, box-shadow .12s, filter .15s; touch-action:manipulation; }
+#startBtn::before { content:''; width:0; height:0; border-style:solid; border-width:10px 0 10px 16px; border-color:transparent transparent transparent currentColor; }
+#startBtn:hover:enabled { background:linear-gradient(180deg,#e8ff9c,#c6f548); filter:brightness(1.03); }
+#startBtn:active:enabled { transform:translateY(4px); box-shadow:0 2px 0 #6f9a12, 0 6px 18px rgba(206,250,87,.3); }
+.city-ready #startBtn { animation:play-pulse 2.2s ease-in-out infinite; }
+@keyframes play-pulse { 0%,100% { box-shadow:0 6px 0 #6f9a12, 0 10px 28px rgba(206,250,87,.3); } 50% { box-shadow:0 6px 0 #6f9a12, 0 10px 40px rgba(206,250,87,.65); } }
+@media (prefers-reduced-motion: reduce) { .city-ready #startBtn { animation:none; } }
+#launch-loading progress { -webkit-appearance:none; appearance:none; height:8px; border:0; border-radius:8px; overflow:hidden; background:rgba(255,255,255,.18); }
+#launch-loading progress::-webkit-progress-bar { background:rgba(255,255,255,.18); border-radius:8px; }
+#launch-loading progress::-webkit-progress-value { background:linear-gradient(90deg,#9fd61f,#dcff74); border-radius:8px; transition:width .4s ease; }
+#launch-loading progress::-moz-progress-bar { background:linear-gradient(90deg,#9fd61f,#dcff74); border-radius:8px; }
+
+@media (max-width:680px) and (orientation:portrait) {
+  .launch-grid { flex:1; display:flex; flex-direction:column; }
+  .launch-copy { flex:1; display:flex; flex-direction:column; max-width:none; }
+  #launch-loading { margin-top:auto; margin-bottom:8px; }
+  .launch-action { margin-top:0; }
+  .city-ready .launch-action { margin-top:auto; margin-bottom:8px; }
+  #launch-loading { max-width:none; width:100%; }
+  .launch-action { width:100%; }
+  #startBtn { max-width:none; min-height:64px; font-size:22px; }
+  .launch-bottom { justify-content:center; }
+}
+#launch-sound { margin:0 0 0 8px; padding:8px 12px; border:1px solid #ffffff40; border-radius:2px; background:transparent; color:#eee8cf; font-size:11px; }
+#launch-sound[aria-pressed="true"] { border-color:#cefa57; color:#cefa57; }
+
+/* ---------------------------------------------------------------- launch: in-app browsers, share card, clip mode */
+/* In-app browsers (src/inapp.js): a small bar at the top of the title screen; never covers Play */
+#inapp-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 0 12px; padding:9px 10px 9px 12px; background:#f1c65b; color:#142c24; border-left:5px solid #8c2447; border-radius:3px; font-size:13px; line-height:1.35; box-shadow:0 6px 18px #0006; }
+#inapp-bar .ib-txt { flex:1 1 220px; min-width:0; }
+#inapp-bar .ib-txt b { display:block; font-size:14px; font-weight:800; }
+#inapp-bar .ib-txt span { display:block; font-size:12px; }
+#inapp-bar .ib-act { display:flex; align-items:center; gap:6px; margin-left:auto; }
+#inapp-bar button { margin:0; min-height:36px; padding:7px 12px; border:0; border-radius:3px; font:700 13px system-ui, "Segoe UI", sans-serif; cursor:pointer; }
+#inapp-bar .ib-copy { background:#142c24; color:#f3efd9; }
+#inapp-bar .ib-x { background:transparent; color:#142c24; font-size:20px; line-height:1; padding:4px 8px; min-width:36px; }
+#inapp-bar .ib-url { flex:1 1 100%; padding:6px 8px; font-size:12px; border:1px solid #142c2466; border-radius:3px; background:#fff8e0; color:#142c24; -webkit-user-select:text; user-select:text; }
+#inapp-bar .ib-msg { flex:1 1 100%; font-size:12px; font-weight:700; }
+#inapp-bar .ib-msg:empty { display:none; }
+@media (max-height:500px) and (orientation:landscape) { #inapp-bar { margin-bottom:6px; padding:5px 8px 5px 10px; } #inapp-bar .ib-txt b { display:inline; font-size:13px; margin-right:6px; } #inapp-bar .ib-txt span { display:inline; } #inapp-bar button { min-height:32px; padding:5px 10px; } }
+
+/* Privacy: the play stats box */
+.launch-panel .stats-row label { display:block; color:#f4f1df; font-weight:600; cursor:pointer; }
+.launch-panel .stats-row input { width:18px; height:18px; vertical-align:-3px; margin:0 8px 0 0; accent-color:#cefa57; }
+.launch-panel .stats-row .dim { display:block; font-size:11px; color:#9fb2a2; margin:3px 0 0 26px; }
+
+/* The share card after a passed mission (src/share.js, src/firstminute.js): in #stage, so it turns with a phone held upright */
+#sharecard { position:fixed; right:calc(var(--sr, 0px) + 18px); top:calc(var(--st, 0px) + 252px); width:min(330px, calc(100% - 36px)); padding:14px 16px 12px; background:linear-gradient(160deg, rgba(20,44,36,.97), rgba(12,24,22,.97)); color:#f3efd9; border:1px solid #cefa5788; border-left:5px solid #cefa57; border-radius:10px; box-shadow:0 10px 30px #0009; z-index:38; pointer-events:auto; font:14px/1.4 system-ui, "Segoe UI", sans-serif; text-shadow:none; animation:shareIn .35s ease-out; }
+#sharecard.touch { right:auto; left:50%; bottom:auto; top:max(calc(var(--st, 0px) + 70px), 20%); transform:translateX(-50%); width:min(340px, 62%); animation:none; }
+@keyframes shareIn { from { transform:translateY(16px); opacity:0 } to { transform:none; opacity:1 } }
+#sharecard .hd b { display:block; font:900 18px system-ui, "Segoe UI", sans-serif; color:#cefa57; letter-spacing:.3px; }
+#sharecard .hd span { display:block; font-size:13px; color:#d9dcc8; margin:2px 22px 0 0; }
+#sharecard .row { display:flex; gap:8px; margin-top:10px; }
+#sharecard .row button { flex:1; margin:0; min-height:40px; padding:8px 10px; border:1px solid #cefa5766; border-radius:6px; background:transparent; color:#f3efd9; font:700 14px system-ui, "Segoe UI", sans-serif; cursor:pointer; }
+#sharecard .row button.go { background:#cefa57; color:#142c24; border-color:#cefa57; }
+#sharecard .x { position:absolute; right:6px; top:4px; margin:0; padding:4px 9px; border:0; background:transparent; color:#f3efd9; font-size:22px; line-height:1; cursor:pointer; min-width:36px; min-height:36px; }
+#sharecard .icons { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+#sharecard .icons[hidden] { display:none; }
+#sharecard .ic { flex:1 1 auto; text-align:center; padding:5px 8px; border-radius:5px; background:#ffffff14; color:#f3efd9; font-size:12px; font-weight:700; text-decoration:none; }
+#sharecard .ic:hover { background:#ffffff26; }
+#sharecard .url { width:100%; margin-top:8px; padding:6px 8px; font-size:12px; border-radius:4px; border:1px solid #cefa5766; background:#0b1712; color:#f3efd9; -webkit-user-select:text; user-select:text; }
+#sharecard .msg { font-size:12px; color:#cefa57; margin-top:6px; min-height:1px; }
+#sharecard .msg:empty { display:none; }
+
+/* Clip mode (src/clipmode.js; docs/launch/CLIP_MODE.md): nothing on top of the game. ?clip=subs keeps the subtitles and
+   the speech captions over people. On a phone the touch controls go see-through but keep working. */
+html.clip #hud > *:not(#vignette) { visibility:hidden !important; }
+html.clip.clip-subs #hud > #subtitle, html.clip.clip-subs #hud > #bubbles, html.clip.clip-subs #hud > #heads { visibility:visible !important; }
+html.clip .msn, html.clip #sharecard, html.clip #wardrobe, html.clip #perfhud, html.clip #alog, html.clip #fr-root, html.clip #crosshair { visibility:hidden !important; }
+html.clip #touchui { opacity:0 !important; }
+html.clip body { cursor:none; }
+#clipGuide { position:fixed; inset:0; z-index:60; pointer-events:none; display:flex; }
+#clipGuide[hidden] { display:none; }
+#clipGuide i { flex:1; background:#000; position:relative; font-style:normal; }
+#clipGuide i span { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); white-space:nowrap; font:600 11px system-ui, "Segoe UI", sans-serif; color:#ffffff59; letter-spacing:.5px; }
+#clipGuide .fr { flex:none; height:100%; aspect-ratio:9 / 16; max-width:100%; box-shadow:inset 0 0 0 1px #cefa5755; }
+#clipNote { position:fixed; left:50%; top:14px; transform:translateX(-50%); z-index:61; padding:6px 12px; border-radius:6px; background:#000c; color:#f3efd9; font:600 13px system-ui, "Segoe UI", sans-serif; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; }
+#clipNote.on { opacity:1; }
+/* ---- the bottom lanes (2026-10-10; src/hudtidy.js installLanes sets --subh / --msnh): the missions' line sits above
+   the subtitle stack instead of on it; on a narrower window the place name and clock sit above both, and a small window
+   shows the newest two subtitle lines only. (html:not(.touch) / html.touch: above src/missions/ui.js's own style) */
+html:not(.touch) #msn-sub { bottom: calc(70px + var(--subh, 0px) + 6px); }
+@media (max-width: 1100px) {
+  html:not(.touch) #msn-sub { bottom: calc(150px + var(--subh, 0px) + 6px); font-size: 16px; max-width: 60vw; }
+  #place { bottom: calc(150px + var(--subh, 0px) + var(--msnh, 0px) + 32px); }
+  #clock { bottom: calc(150px + var(--subh, 0px) + var(--msnh, 0px) + 14px); }
+}
+@media (max-width: 760px), (max-height: 600px) {
+  html:not(.touch) #subtitle { bottom: 132px; font-size: 15px; max-width: 76vw; }
+  html:not(.touch) #subtitle > div:not(:nth-last-child(-n+2)) { display: none; }
+  html:not(.touch) #msn-sub { bottom: calc(132px + var(--subh, 0px) + 6px); font-size: 15px; max-width: 76vw; }
+  #place { bottom: calc(132px + var(--subh, 0px) + var(--msnh, 0px) + 30px); font-size: 15px; }
+  #clock { bottom: calc(132px + var(--subh, 0px) + var(--msnh, 0px) + 13px); font-size: 12px; }
+  #prompt { bottom: 96px; max-width: 80vw; }
+  #minimap { width: 140px; height: 140px; }
+  #stats { width: 170px; padding: 7px 10px; }
+  #wallet { font-size: 18px; }
+}
+@media (max-width: 520px), (max-height: 560px) { #minimap { width: 104px; height: 104px; } }
+html.touch #msn-sub { bottom: calc(var(--sb) + 8px + var(--subh, 0px) + 4px); }
+/* the pause menu never runs off a short window: it scrolls */
+#gfx .card { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; }
+/* "Report a problem" (src/diagnostics.js): the title screen's panel and the pause menu's */
+.report-panel button, #gfx details.report button { margin: 6px 8px 0 0; padding: 7px 14px; font-size: 13px; border-radius: 8px; }
+.report-panel textarea, #gfx details.report textarea { display: block; box-sizing: border-box; width: 100%; margin-top: 8px; max-height: 40vh; font: 11px/1.35 ui-monospace, Consolas, monospace;
+  color: #dfe8da; background: #050a07; border: 1px solid #405847; border-radius: 6px; padding: 6px; resize: vertical; }
+.report-panel textarea[hidden], #gfx details.report textarea[hidden] { display: none; }
+.report-panel [data-diag-status]:empty, #gfx details.report [data-diag-status]:empty { display: none; }
+#gfx details.report { margin: 4px 0 12px; font-size: 14px; }
+#gfx details.report summary { cursor: pointer; opacity: .8; font-size: 13px; }
+#gfx details.report[open] summary { opacity: 1; }
+#gfx details.report button { background: rgba(255,255,255,.12); color: #fff; font-weight: 600; }
+.privacy-panel p { margin: 0 0 8px; }
+
+/* Saving (src/saveflow.js): the HUD's indicator, the pause menu's actions, the title's Continue line, the question box */
+#savestate { position: absolute; right: 18px; top: 18px; padding: 5px 11px; border-radius: 6px; background: rgba(0,0,0,.5); font-size: 13px; font-weight: 600; opacity: .9; transition: opacity .4s; pointer-events: none; }
+#savestate.hidden { display: none; }
+#savestate[data-kind="saved"] { color: #9fe38b; }
+#savestate[data-kind="failed"] { color: #ffb3a7; }
+#gfx .card { max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+#gfx .resume { display: block; width: 100%; min-height: 48px; font-size: 17px; margin: 0 0 10px; }
+#gfx .pause-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; }
+#gfx .pause-actions button { flex: 1 1 150px; min-height: 44px; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.07); color: #fff; font-weight: 700; cursor: pointer; }
+#gfx .pause-actions button:hover { background: rgba(255,255,255,.15); }
+#gfx .pause-actions button[hidden] { display: none; }
+#gfx .save-status { margin: 0 0 10px; }
+#gfx details.settings > summary, #gfx details.report > summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
+/* under the primary button: the Continue line and New game, the same family as the Play button (rounded, letter-spaced
+   caps) in a quiet second voice; while the city loads only the progress line and bar show, as before this release */
+#launch-save { color: #cefa57; font-size: 13px; line-height: 1.4; letter-spacing: .3px; max-width: 320px; margin: 10px 0 0; text-align: center; text-shadow: 0 1px 4px #000; }
+#launch-save.hidden { display: none; }
+.launch-secondary { display: block; width: 100%; max-width: 320px; min-height: 48px; margin: 10px 0 0; padding: 11px 24px; border-radius: 16px; border: 1px solid rgba(206,250,87,.55); background: rgba(12,24,22,.62); color: #f4f1df;
+  font-size: 15px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; text-align: center; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,.35); transition: background .15s, border-color .15s, transform .12s; touch-action: manipulation; }
+.launch-secondary:hover { background: rgba(206,250,87,.14); border-color: #cefa57; color: #cefa57; }
+.launch-secondary:active { transform: translateY(2px); }
+.launch-secondary.hidden { display: none; }
+#title:not(.city-ready) #launch-save, #title:not(.city-ready) #newGameBtn { display: none; }
+@media (max-width:680px) and (orientation:portrait) { #launch-save, .launch-secondary { max-width: none; } .launch-secondary { min-height: 52px; font-size: 16px; } }
+.launch-link { display: inline-block; padding: 15px 18px 15px 0; font-size: 13px; font-weight: 600; color: #cefa57; }
+.launch-link[hidden] { display: none; }
+.settings-head { margin: 10px 0 6px; font-weight: 700; color: #f4f1df; }
+.save-panel { margin-top: 14px; padding-top: 10px; border-top: 1px solid #405847; }
+.save-panel button { font-size: 12px; border-radius: 3px; padding: 11px 16px; margin: 4px 8px 4px 0; background: #203e30; color: #f4f1df; border: 1px solid #6a8066; cursor: pointer; }
+.save-panel button:disabled { opacity: .5; cursor: default; }
+.save-panel #save-new { border-color: #a35; }
+.launch-panel .dim { opacity: .7; }
+.ask { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.55); }
+#stage .ask { position: absolute; }
+.ask .card { background: rgba(18, 22, 28, .97); color: #fff; border-radius: 12px; padding: 20px 22px; width: min(440px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,.6); font: 15px/1.45 system-ui, "Segoe UI", sans-serif; }
+.ask h2 { margin: 0 0 8px; font-size: 20px; }
+.ask p { margin: 0 0 14px; opacity: .9; }
+.ask .buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.ask .buttons button { flex: 1 1 120px; min-height: 44px; padding: 9px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.ask .buttons button.primary { background: #cefa57; color: #142c24; border-color: #cefa57; }
+.ask .buttons button.danger { background: #c0392b; color: #fff; border-color: #c0392b; }
+.ask :focus-visible { outline: 3px solid #cefa57; outline-offset: 3px; }
+
+/* Community links (src/links.js): the Discord pill leads the title's bottom links - there from the first frame of the
+   loading screen, never near the Play button or the bar; the pause menu's small Discord link */
+.launch-community { display:flex; flex-wrap:wrap; align-items:center; gap:12px; order:-1; flex-basis:100%; padding:12px 0 8px; }
+.launch-community:not(:has(a:not([hidden]))) { display:none; }
+.discord-pill { display:inline-flex; align-items:center; gap:9px; min-height:44px; padding:0 18px 0 14px; border-radius:22px; background:#5865f2; color:#fff;
+  font-size:13px; font-weight:800; letter-spacing:.6px; text-decoration:none; box-shadow:0 4px 14px rgba(0,0,0,.4); transition:background .15s, transform .12s; touch-action:manipulation; }
+.discord-pill[hidden] { display:none; }
+.discord-pill:hover { background:#6d78f5; }
+.discord-pill:active { transform:translateY(1px); }
+.discord-pill:focus-visible { outline:3px solid #cefa57; outline-offset:3px; }
+.discord-pill .dc-mark { flex:none; }
+.support-pill, .creator-pill { display:inline-flex; align-items:center; gap:12px; min-height:58px; box-sizing:border-box; padding:10px 18px; border-radius:14px; text-decoration:none; font-size:16px; line-height:1.25; font-weight:800; touch-action:manipulation; }
+.support-pill { background:#cefa57; color:#10251b; border:1px solid #e3ff9c; box-shadow:0 4px 18px #0005; }
+.support-pill small { display:block; margin-top:4px; font-size:11px; font-weight:600; }
+.support-pill:hover { background:#e1ff8f; }
+.creator-pill { background:#10251bf2; border:1px solid #afc5b0; color:#f4f1df; }
+.creator-pill small { display:block; color:#d4dfce; font-size:11px; font-weight:500; margin-bottom:2px; }
+.creator-pill strong { font-size:16px; }
+.creator-pill:hover { background:#244632; border-color:#cefa57; }
+.creator-x { font-size:25px; }
+.external-mark { margin-left:auto; font-size:20px; }
+.support-pill[hidden], .creator-pill[hidden] { display:none; }
+.support-pill:focus-visible, .creator-pill:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+.launch-community .discord-pill { min-height:58px; box-sizing:border-box; border-radius:14px; font-size:14px; }
+@media (max-width:680px) and (orientation:portrait) {
+ .launch-community { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:4px; }
+ .launch-community .support-pill { grid-column:1 / -1; min-height:60px; }
+ .launch-community .discord-pill, .launch-community .creator-pill { justify-content:center; min-width:0; padding:10px; gap:8px; }
+ .launch-community .discord-pill { font-size:12px; letter-spacing:0; }
+ .creator-pill strong { font-size:14px; }
+ .creator-pill .external-mark { display:none; }
+}
+#gfx .pause-links { margin:4px 0 0; font-size:13px; }
+#gfx details.controls { margin:6px 0; }
+#gfx details.controls summary { cursor:pointer; font-weight:700; padding:6px 0; }
+#gfx .controls-host .controls-grid { grid-template-columns:1fr; gap:6px; text-align:left; max-height:40vh; overflow-y:auto; font-size:13px; padding:4px 2px; }
+#gfx .controls-host kbd { display:inline-block; min-width:2.2em; padding:1px 6px; margin-right:6px; border:1px solid #8a93a8; border-radius:5px; background:#1b2230; color:#e9ecf5; font:600 12px/1.5 ui-monospace,Consolas,monospace; text-align:center; }
+#gfx .pause-links a { display:inline-flex; align-items:center; min-height:44px; box-sizing:border-box; padding:10px 14px; margin:4px 8px 4px 0; border:1px solid #747ebd; border-radius:10px; color:#dce0ff; font-weight:700; text-decoration:none; }
+#gfx .pause-links a[data-community="support"] { background:#cefa57; border-color:#cefa57; color:#10251b; }
+#gfx .pause-links a[hidden] { display:none; }
+#gfx .pause-links a:hover { text-decoration:underline; }
+#gfx .pause-links:not(:has(a:not([hidden]))) { display:none; }
+
+/* Play online: the connecting screen (main.js gateOnline) - the loading line and bar again, the buttons away until the room has us */
+#title.city-ready.mp-connecting #launch-loading { display:block; }
+#title.mp-connecting .launch-action button { display:none !important; }
+
+/* Play online: how many are playing now, and the test code (main.js refreshOnlineCount / askCode) */
+#online-count { color:#d6f26a; font-size:12px; margin:6px 0 0; text-shadow:0 1px 4px #000; }
+#online-code { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 0; }
+#online-code.hidden { display:none; }
+#online-code label { width:100%; color:#e2e8d9; font-size:12px; text-shadow:0 1px 4px #000; }
+#online-code input { width:120px; font:600 18px/1.2 inherit; letter-spacing:2px; padding:8px 10px; border-radius:6px; border:1px solid #6d8a52; background:#0c1816; color:#f4f1df; }
+#online-code button { padding:9px 16px; border-radius:6px; border:0; background:#d6f26a; color:#142c24; font-weight:700; }
+#title.mp-connecting #online-code, #title.mp-connecting #online-count { display:none; }
+
+/* Play online: the number playing, big, inside the button; FULL when there's no seat; your name under it (main.js) */
+#onlineBtn { display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1.15; }
+#onlineBtn .mp-count { font-size:20px; font-weight:800; letter-spacing:.5px; color:#d6f26a; }
+#onlineBtn.mp-full .mp-count { color:#ff7a6b; }
+#onlineBtn .mp-label { font-size:12px; opacity:.9; }
+#online-count a { color:#d6f26a; text-decoration:underline; cursor:pointer; }
+#online-code input#online-name-input { width:180px; letter-spacing:0; font-size:16px; }
