@@ -1,4 +1,4 @@
-https://brisbane-streets.pages.dev - ORIGINAL CREATOR AND OWNER OF BRISBANE STREETS
+https://brisbane-streets.pages.dev - ORIGINAL CREATOR AND OWNER OF BRISBANE STREETS AND ITS ASSETS
 
 https://sheagames.github.io/bypassed-streets.github.io - ALTERNATIVE URL SINCE ORIGINAL GOT BLOCKED :(
 
